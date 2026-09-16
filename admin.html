@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Manage projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B1220;--surface:#141E30;--surface-2:#1B2740;--line:#26334D;--text:#E6EAF2;--muted:#8C97AD;--copper:#E39A4F;--blue:#5B9BF0;--ok:#6FCF97;--err:#F08A8A;--font:"Geist",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 1rem/1.55 var(--font)}
+a{color:var(--copper)}
+:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 120px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:1.8rem;letter-spacing:-.03em;margin:0}
+h2{font-size:1.15rem;margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px}
+.btn{font:600 .9rem var(--font);padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--copper);color:var(--copper)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#1A1206}
+.btn.small{padding:6px 12px;font-size:.82rem}
+.btn.icon{padding:6px 10px;font-size:.82rem;min-width:34px}
+.btn.danger:hover{border-color:var(--err);color:var(--err)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:flex;flex-direction:column;gap:5px;font-size:.85rem;color:var(--muted);font-weight:500}
+.full{grid-column:1/-1}
+input,textarea,select{font:400 .98rem var(--font);padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);width:100%}
+textarea{min-height:110px;resize:vertical}
+.toggles{display:flex;gap:22px;flex-wrap:wrap}
+.toggles label{flex-direction:row;align-items:center;gap:8px;color:var(--text)}
+.toggles input{width:18px;height:18px;accent-color:var(--copper)}
+.hint{font-size:.8rem;color:var(--muted);font-weight:400}
+.msg{min-height:1.4em;font-size:.9rem;margin:0}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.list .name{min-width:0}
+.list .name b{font-weight:600}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;margin:4px 6px 0 0;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.pill.hidden{background:rgba(240,138,138,.12);color:var(--err);border-color:transparent}
+.pill[data-s="Completed"]{color:var(--ok)} .pill[data-s="In progress"]{color:var(--copper)} .pill[data-s="Planned"]{color:var(--blue)}
+.preview-img{max-width:240px;border-radius:8px;border:1px solid var(--line);margin-top:6px}
+.savebar{position:fixed;left:0;right:0;bottom:0;background:rgba(20,30,48,.96);backdrop-filter:blur(10px);border-top:1px solid var(--copper);padding:14px 20px;display:none}
+.savebar.on{display:block}
+.savebar .inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
+ol.steps{padding-left:1.2em;color:var(--muted);font-size:.9rem}
+@media (max-width:640px){form{grid-template-columns:1fr}.list li{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Manage projects</h1>
+    <div class="row"><a class="btn small" href="./" target="_blank" rel="noopener">View site</a><button class="btn small" id="signout" hidden>Sign out</button></div>
+  </header>
+
+  <!-- CONNECT -->
+  <div class="card" id="connectCard">
+    <h2>Connect to GitHub</h2>
+    <form id="connect">
+      <label>GitHub username<input name="owner" value="WhiteScholar-01" required></label>
+      <label>Repository<input name="repo" value="WhiteScholar-01.github.io" required></label>
+      <label>Branch<input name="branch" value="main" required></label>
+      <label>Access token <span class="hint">Starts with github_pat_</span><input type="password" name="token" autocomplete="off" required></label>
+      <div class="full toggles"><label><input type="checkbox" name="remember"> Remember on this device</label></div>
+      <div class="full"><button class="btn primary" type="submit">Connect</button></div>
+      <p class="msg full" id="connectMsg" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="app" hidden>
+    <!-- FORM -->
+    <div class="card">
+      <h2 id="formTitle">Add a project</h2>
+      <form id="pform">
+        <input type="hidden" name="index" value="">
+        <label class="full">Title<input name="title" required></label>
+        <label>Status<select name="status"><option>In progress</option><option>Completed</option><option>Planned</option><option>On hold</option></select></label>
+        <label>Category<select name="category"><option>Motor drives</option><option>Power electronics</option><option>Control</option><option>Embedded</option><option>RF &amp; antennas</option><option>Web</option><option>Other</option></select></label>
+        <label>Year<input name="year" placeholder="2026"></label>
+        <label>Image<input type="file" name="file" accept="image/*"><span class="hint">Resized and saved to the images folder</span></label>
+        <label class="full">Short description <span class="hint">One or two sentences on the card</span><textarea name="summary" required maxlength="260" style="min-height:70px"></textarea></label>
+        <label class="full">Highlights <span class="hint">One per line. Shown when someone opens the project.</span><textarea name="details"></textarea></label>
+        <label class="full">Tags <span class="hint">Comma separated</span><input name="tags" placeholder="MATLAB, Simulink, FOC"></label>
+        <label>Code link<input type="url" name="code_url" placeholder="https://github.com/WhiteScholar-01/..."></label>
+        <label>Live demo or report link<input type="url" name="demo_url"></label>
+        <label class="full">Image path <span class="hint">Filled in automatically after upload, or type one like images/tracker.jpg</span><input name="image"></label>
+        <div class="full" id="imgPreview"></div>
+        <div class="full toggles">
+          <label><input type="checkbox" name="published" checked> Show on site</label>
+          <label><input type="checkbox" name="featured"> Featured (large card)</label>
+        </div>
+        <div class="full row"><button class="btn primary" type="submit" id="addBtn">Add to list</button><button class="btn" type="button" id="clearBtn">Clear form</button></div>
+        <p class="msg full" id="formMsg" role="status"></p>
+      </form>
+    </div>
+
+    <!-- LIST -->
+    <div class="card">
+      <h2>Your projects <span class="hint">Top of the list shows first on the site</span></h2>
+      <ul class="list" id="list"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="savebar" id="savebar">
+  <div class="inner">
+    <span id="saveText">You have unpublished changes.</span>
+    <div class="row"><button class="btn small" id="discardBtn">Discard</button><button class="btn primary" id="publishBtn">Publish to site</button></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const say = (el, t, ok) => { el.textContent = t; el.className = "msg full " + (ok ? "ok" : "err"); };
+const KEY = "portfolio-admin";
+let cfg = null, sha = null, projects = [], saved = "[]", pendingImage = null;
+
+/* ---------- GitHub API ---------- */
+async function gh(path, opts = {}){
+  const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, {
+    ...opts,
+    headers: { "Authorization": `Bearer ${cfg.token}`, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.headers||{}) }
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok){
+    const why = res.status === 401 ? "The token is wrong or expired."
+      : res.status === 403 ? "The token doesn't have permission to write to this repository."
+      : res.status === 404 ? "Repository or file not found. Check the username, repository and branch."
+      : res.status === 409 ? "The file changed on GitHub since you loaded it. Reload this page and try again."
+      : body.message || `GitHub error ${res.status}`;
+    throw new Error(why);
+  }
+  return body;
+}
+const toB64 = str => { const bytes = new TextEncoder().encode(str); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b)); return btoa(bin); };
+const fromB64 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g,"")), c => c.charCodeAt(0)));
+
+async function loadProjects(){
+  const file = await gh(`projects.json?ref=${encodeURIComponent(cfg.branch)}`);
+  sha = file.sha;
+  projects = JSON.parse(fromB64(file.content));
+  saved = JSON.stringify(projects);
+}
+
+/* ---------- connect ---------- */
+function start(){
+  const stored = localStorage.getItem(KEY) || sessionStorage.getItem(KEY);
+  if (stored){ cfg = JSON.parse(stored); connectAndLoad(); }
+}
+$("#connect").onsubmit = e => {
+  e.preventDefault();
+  const f = e.target;
+  cfg = { owner: f.owner.value.trim(), repo: f.repo.value.trim(), branch: f.branch.value.trim(), token: f.token.value.trim() };
+  (f.remember.checked ? localStorage : sessionStorage).setItem(KEY, JSON.stringify(cfg));
+  connectAndLoad();
+};
+async function connectAndLoad(){
+  say($("#connectMsg"), "Connecting…", true);
+  try {
+    await loadProjects();
+    $("#connectCard").hidden = true; $("#app").hidden = false; $("#signout").hidden = false;
+    renderList(); dirtyCheck();
+  } catch (err){
+    say($("#connectMsg"), err.message);
+    localStorage.removeItem(KEY); sessionStorage.removeItem(KEY);
+  }
+}
+$("#signout").onclick = () => {
+  if (isDirty() && !confirm("You have unpublished changes. Sign out anyway?")) return;
+  localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); location.reload();
+};
+
+/* ---------- list ---------- */
+function renderList(){
+  $("#list").innerHTML = projects.length ? projects.map((p,i) => `
+    <li>
+      <div class="name"><b>${esc(p.title)}</b><br>
+        <span class="pill" data-s="${esc(p.status)}">${esc(p.status || "No status")}</span><span class="pill">${esc(p.category)}</span>${p.published === false ? `<span class="pill hidden">Hidden</span>` : ""}${p.featured ? `<span class="pill">Featured</span>` : ""}
+      </div>
+      <div class="row">
+        <button class="btn icon" data-up="${i}" ${i===0?"disabled":""} aria-label="Move up">↑</button>
+        <button class="btn icon" data-down="${i}" ${i===projects.length-1?"disabled":""} aria-label="Move down">↓</button>
+        <button class="btn small" data-edit="${i}">Edit</button>
+        <button class="btn small danger" data-del="${i}">Delete</button>
+      </div>
+    </li>`).join("") : `<li class="hint">No projects yet. Add one above.</li>`;
+}
+$("#list").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const d = b.dataset;
+  if (d.up){ const i = +d.up; [projects[i-1], projects[i]] = [projects[i], projects[i-1]]; }
+  if (d.down){ const i = +d.down; [projects[i+1], projects[i]] = [projects[i], projects[i+1]]; }
+  if (d.edit){ fillForm(projects[+d.edit], +d.edit); $("#pform").scrollIntoView({behavior:"smooth"}); return; }
+  if (d.del){
+    if (!confirm(`Remove "${projects[+d.del].title}" from the list?`)) return;
+    projects.splice(+d.del, 1);
+    const f = $("#pform"); if (f.index.value === d.del) clearForm();
+  }
+  renderList(); dirtyCheck();
+};
+
+/* ---------- form ---------- */
+const form = $("#pform");
+function fillForm(p, i){
+  clearForm();
+  form.index.value = i;
+  for (const k of ["title","year","summary","image","code_url","demo_url"]) form[k].value = p[k] ?? "";
+  form.status.value = p.status || "In progress";
+  form.category.value = p.category || "Other";
+  form.details.value = (p.details || []).join("\n");
+  form.tags.value = (p.tags || []).join(", ");
+  form.published.checked = p.published !== false;
+  form.featured.checked = !!p.featured;
+  $("#formTitle").textContent = "Edit project";
+  $("#addBtn").textContent = "Update in list";
+  showPreview(p.image ? rawUrl(p.image) : "");
+}
+function clearForm(){
+  form.reset(); form.index.value = ""; pendingImage = null;
+  $("#formTitle").textContent = "Add a project"; $("#addBtn").textContent = "Add to list";
+  $("#imgPreview").innerHTML = ""; $("#formMsg").textContent = "";
+}
+$("#clearBtn").onclick = clearForm;
+const rawUrl = path => /^https?:/.test(path) ? path : `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${path}`;
+const showPreview = src => $("#imgPreview").innerHTML = src ? `<img class="preview-img" src="${esc(src)}" alt="">` : "";
+
+/* Resize big photos in the browser before uploading, so the site stays fast */
+function resizeImage(file, maxW = 1400){
+  return new Promise((resolve, reject) => {
+    if (file.type === "image/svg+xml" || file.type === "image/gif") {
+      const r = new FileReader(); r.onload = () => resolve({ b64: r.result.split(",")[1], ext: file.type === "image/gif" ? "gif" : "svg" }); r.onerror = reject; r.readAsDataURL(file); return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.width);
+      const c = document.createElement("canvas"); c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      resolve({ b64: c.toDataURL("image/jpeg", .82).split(",")[1], ext: "jpg", preview: c.toDataURL("image/jpeg", .82) });
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => reject(new Error("That file couldn't be read as an image."));
+    img.src = URL.createObjectURL(file);
+  });
+}
+form.file.onchange = async () => {
+  const f = form.file.files[0]; if (!f) return;
+  try { pendingImage = await resizeImage(f); showPreview(pendingImage.preview || URL.createObjectURL(f)); say($("#formMsg"), "Image ready. It uploads when you add the project.", true); }
+  catch (err){ say($("#formMsg"), err.message); pendingImage = null; }
+};
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50) || "project";
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  const msg = $("#formMsg"); $("#addBtn").disabled = true;
+  try {
+    let image = form.image.value.trim();
+    if (pendingImage){
+      say(msg, "Uploading image…", true);
+      const path = `images/${slug(form.title.value)}-${Date.now().toString(36)}.${pendingImage.ext}`;
+      await gh(path, { method: "PUT", body: JSON.stringify({ message: `Add image ${path}`, content: pendingImage.b64, branch: cfg.branch }) });
+      image = path; pendingImage = null;
+    }
+    const p = {
+      title: form.title.value.trim(), year: form.year.value.trim(), category: form.category.value, status: form.status.value,
+      featured: form.featured.checked, published: form.published.checked,
+      summary: form.summary.value.trim(),
+      details: form.details.value.split("\n").map(s => s.trim()).filter(Boolean),
+      tags: form.tags.value.split(",").map(s => s.trim()).filter(Boolean),
+      image, code_url: form.code_url.value.trim(), demo_url: form.demo_url.value.trim()
+    };
+    const i = form.index.value;
+    if (i === "") projects.unshift(p); else projects[+i] = p;
+    renderList(); dirtyCheck(); clearForm();
+    say(msg, `"${p.title}" ${i === "" ? "added" : "updated"}. Tap Publish to site when you're done.`, true);
+  } catch (err){ say(msg, "Couldn't upload the image: " + err.message); }
+  $("#addBtn").disabled = false;
+};
+
+/* ---------- publish ---------- */
+const isDirty = () => JSON.stringify(projects) !== saved;
+function dirtyCheck(){ $("#savebar").classList.toggle("on", isDirty()); $("#saveText").textContent = "You have unpublished changes."; }
+$("#discardBtn").onclick = () => { if (!confirm("Discard all unpublished changes?")) return; projects = JSON.parse(saved); renderList(); clearForm(); dirtyCheck(); };
+$("#publishBtn").onclick = async () => {
+  const btn = $("#publishBtn"); btn.disabled = true; $("#saveText").textContent = "Publishing…";
+  try {
+    const res = await gh("projects.json", { method: "PUT", body: JSON.stringify({
+      message: "Update projects from admin page", content: toB64(JSON.stringify(projects, null, 2) + "\n"), sha, branch: cfg.branch }) });
+    sha = res.content.sha; saved = JSON.stringify(projects);
+    $("#saveText").textContent = "Published. The site updates in 1–2 minutes.";
+    setTimeout(dirtyCheck, 4000);
+    $("#savebar").classList.add("on");
+  } catch (err){ $("#saveText").textContent = "Couldn't publish: " + err.message; }
+  btn.disabled = false;
+};
+addEventListener("beforeunload", e => { if (isDirty()){ e.preventDefault(); e.returnValue = ""; } });
+
+start();
+</script>
+</body>
+</html>
