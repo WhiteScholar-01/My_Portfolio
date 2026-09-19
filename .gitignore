@@ -1,0 +1,22 @@
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# OneDrive conflict copies — these should never reach GitHub
+*-conflict-*
+*(conflicted copy)*
+
+# Local scratch
+node_modules/
+.cache/
+*.log
+_to_delete/
+
+# Never commit a token. The admin page keeps it in the browser only.
+.env
+*.token
+secrets.*

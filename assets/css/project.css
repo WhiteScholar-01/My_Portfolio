@@ -1,0 +1,170 @@
+/* ==========================================================================
+   project.css — extras for the per-project pages at projects/<slug>/
+   Loaded after tokens.css and site.css, which do the heavy lifting.
+   ========================================================================== */
+
+.p-hero { padding: calc(var(--nav-h) + 64px) 0 12px; position: relative; }
+
+.crumb {
+  font: 500 .78rem var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.crumb a { color: var(--muted); text-decoration: none; }
+.crumb a:hover { color: var(--accent); }
+.crumb .sep { color: var(--line); }
+
+.p-hero h1 {
+  font-size: clamp(2.2rem, 5.6vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  font-weight: 740;
+  margin: 0 0 16px;
+  max-width: 20ch;
+}
+.p-lede { font-size: 1.15rem; color: var(--text-2); max-width: 62ch; margin: 0 0 24px; }
+
+/* The spec strip — reads like a title block on an engineering drawing. */
+.specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+  margin: 0 0 40px;
+}
+.specs > div {
+  padding: 13px 20px;
+  border-right: 1px solid var(--line);
+  min-width: 128px;
+  flex: 1 1 auto;
+}
+.specs > div:last-child { border-right: 0; }
+.specs dt {
+  font: 500 .7rem/1 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.specs dd { margin: 0; font-weight: 600; color: var(--text); font-size: .95rem; }
+.specs .dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 7px;
+  vertical-align: 1px;
+  background: var(--muted);
+}
+.specs .dot[data-s="Completed"] { background: var(--ok); }
+.specs .dot[data-s="In progress"] { background: var(--accent); }
+.specs .dot[data-s="Planned"] { background: var(--planned); }
+@media (max-width: 600px) {
+  .specs > div { border-right: 0; border-bottom: 1px solid var(--line); flex-basis: 100%; }
+  .specs > div:last-child { border-bottom: 0; }
+}
+
+.p-body { display: grid; grid-template-columns: 1.55fr 1fr; gap: 52px; align-items: start; }
+@media (max-width: 900px) { .p-body { grid-template-columns: 1fr; gap: 32px; } }
+
+.p-section { margin-bottom: 40px; }
+.p-section > h2 {
+  font: 500 .8rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.p-section > h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.highlights { margin: 0; padding-left: 1.15em; color: var(--text-2); }
+.highlights li { margin-bottom: 10px; }
+.highlights li::marker { color: var(--accent); }
+
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.gallery figure { margin: 0; }
+.gallery img {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.gallery figcaption {
+  font: 400 .8rem var(--font-mono);
+  color: var(--muted);
+  margin-top: 7px;
+}
+.gallery.single { grid-template-columns: 1fr; }
+@media (max-width: 560px) { .gallery { grid-template-columns: 1fr; } }
+
+/* Empty state for a project folder with no images in it yet. */
+.no-media {
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+  padding: 30px 22px;
+  text-align: center;
+  color: var(--muted);
+  font: 400 .9rem var(--font-mono);
+  background-image:
+    linear-gradient(var(--grid-c1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-c1) 1px, transparent 1px);
+  background-size: var(--grid-major) var(--grid-major);
+}
+
+.side .sheet { padding: 18px 20px; margin-bottom: 16px; }
+.side h3 {
+  font: 500 .74rem/1 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.side .tags span { font-size: .8rem; }
+.side .btn { width: 100%; justify-content: center; margin-bottom: 8px; }
+.side .btn:last-child { margin-bottom: 0; }
+
+/* Previous / next project */
+.p-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding: 28px 0 0;
+  margin-top: 20px;
+}
+.p-nav a {
+  text-decoration: none;
+  color: var(--text);
+  max-width: 46%;
+  display: block;
+}
+.p-nav a span {
+  display: block;
+  font: 500 .72rem var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.p-nav a:hover { color: var(--accent); }
+.p-nav .next { text-align: right; margin-left: auto; }
+@media (max-width: 560px) { .p-nav a { max-width: 100%; } .p-nav .next { text-align: left; margin-left: 0; } }
+
+.p-error { padding: calc(var(--nav-h) + 80px) 0 80px; text-align: center; }
+.p-error h1 { font-size: 1.6rem; margin-bottom: 10px; }

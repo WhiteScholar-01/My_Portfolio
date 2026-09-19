@@ -1,8 +1,10 @@
 [
   {
+    "slug": "five-phase-ipmsm-foc",
     "title": "Five-phase IPMSM field-oriented control",
     "year": "2026",
     "category": "Motor drives",
+    "org": "IIT Ropar",
     "featured": true,
     "published": true,
     "summary": "Modelling and control of a five-phase interior permanent magnet synchronous motor, from Simulink to TI DSP hardware at IIT Ropar.",
@@ -20,14 +22,17 @@
       "TI C2000"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "Completed"
   },
   {
+    "slug": "two-axis-antenna-tracker",
     "title": "Two-axis satellite antenna tracker",
     "year": "2025",
     "category": "Embedded",
+    "org": "Orbitalink",
     "featured": false,
     "published": true,
     "summary": "Azimuth–elevation tracker for UHF satellite passes, built end to end at Orbitalink.",
@@ -44,14 +49,17 @@
       "C++"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "In progress"
   },
   {
+    "slug": "cross-yagi-435mhz",
     "title": "435 MHz cross-Yagi antenna",
     "year": "2025",
     "category": "RF & antennas",
+    "org": "Orbitalink",
     "featured": false,
     "published": true,
     "summary": "Circularly polarised antenna for amateur satellites, modelled in MMANA-GAL before building.",
@@ -66,14 +74,17 @@
       "UHF"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "In progress"
   },
   {
+    "slug": "adaptive-pid-mount",
     "title": "Adaptive PID for a high-inertia mount",
     "year": "2025",
     "category": "Control",
+    "org": "Orbitalink · AMU Innovation Foundation",
     "featured": false,
     "published": true,
     "summary": "Adaptive controller that stabilises and precisely points a heavy antenna tracker, with AMU Innovation Foundation.",
@@ -83,14 +94,17 @@
       "System modelling"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "Completed"
   },
   {
+    "slug": "sdr-image-downlink",
     "title": "Image downlink over software-defined radio",
     "year": "",
     "category": "RF & antennas",
+    "org": "",
     "featured": false,
     "published": true,
     "summary": "Wavelet-based image compression on a Raspberry Pi Compute Module 4, transmitted with GNU Radio.",
@@ -101,14 +115,17 @@
       "GNU Radio"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "Completed"
   },
   {
+    "slug": "dc-dc-boost-converter",
     "title": "DC-DC boost converter",
     "year": "",
     "category": "Power electronics",
+    "org": "",
     "featured": false,
     "published": true,
     "summary": "Simulink model analysing steady-state and transient response across duty cycles and loads.",
@@ -118,14 +135,17 @@
       "SMPS"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "Completed"
   },
   {
+    "slug": "weather-dashboard",
     "title": "Weather dashboard",
     "year": "",
     "category": "Web",
+    "org": "",
     "featured": false,
     "published": true,
     "summary": "Responsive app with live weather for any city and API error handling, deployed on Render.",
@@ -136,6 +156,7 @@
       "JavaScript"
     ],
     "image": "",
+    "gallery": [],
     "code_url": "",
     "demo_url": "",
     "status": "Completed"

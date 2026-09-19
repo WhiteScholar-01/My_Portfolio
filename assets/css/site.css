@@ -1,0 +1,750 @@
+/* ==========================================================================
+   site.css — layout and components
+   Depends on tokens.css for every colour and measurement.
+   Section order: base -> chrome -> hero -> sections -> components -> motion
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 12px);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-2);
+  font: 400 1.0625rem/1.65 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background var(--t-mid), color var(--t-mid);
+}
+
+/* The blueprint texture. Two superimposed grids — a 48px major rule and an
+   8px minor rule — at very low opacity, so it reads as drawing paper rather
+   than as a pattern. It sits behind everything and never scrolls out. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-c1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-c1) 1px, transparent 1px),
+    linear-gradient(var(--grid-c2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-c2) 1px, transparent 1px);
+  background-size:
+    var(--grid-major) var(--grid-major),
+    var(--grid-major) var(--grid-major),
+    var(--grid-minor) var(--grid-minor),
+    var(--grid-minor) var(--grid-minor);
+  /* fade the grid out toward the bottom so long pages stay calm */
+  -webkit-mask-image: linear-gradient(var(--bg) 0 68%, transparent 100%);
+          mask-image: linear-gradient(var(--bg) 0 68%, transparent 100%);
+}
+
+img, svg, canvas { max-width: 100%; display: block; }
+
+a { color: var(--accent-strong); text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+code {
+  font: 400 .88em var(--font-mono);
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+h1, h2, h3, h4 { color: var(--text); }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+.muted { color: var(--muted); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* A recurring blueprint motif: a small copper corner tick on raised sheets. */
+.ticked { position: relative; }
+.ticked::after {
+  content: "";
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 9px; height: 9px;
+  border-top: 1.5px solid var(--accent-line);
+  border-right: 1.5px solid var(--accent-line);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. Page chrome: progress bar, header, nav, theme toggle
+   -------------------------------------------------------------------------- */
+#progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--signal));
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  z-index: 30;
+}
+
+header.top {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  border-bottom: 1px solid transparent;
+  transition: background var(--t-mid), border-color var(--t-mid);
+}
+header.top.scrolled {
+  background: var(--nav-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: var(--line);
+}
+header.top .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--nav-h);
+}
+
+.mark {
+  font: 700 1.05rem var(--font-sans);
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -.01em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.mark .dot { color: var(--accent); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+nav ul { display: flex; gap: 26px; list-style: none; margin: 0; padding: 0; }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .92rem;
+  font-weight: 500;
+  transition: color var(--t-fast);
+}
+nav a:hover, nav a.current { color: var(--text); }
+nav a.current { position: relative; }
+nav a.current::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+/* Icon buttons (theme toggle, mobile menu) */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn svg { width: 17px; height: 17px; }
+/* One button, two glyphs: show whichever the *next* click would give you. */
+:root[data-theme="dark"] .icon-sun,
+:root:not([data-theme="dark"]) .icon-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .icon-sun { display: block; }
+  :root:not([data-theme]) .icon-moon { display: none; }
+}
+
+.menu-btn { display: none; }
+
+@media (max-width: 880px) {
+  .menu-btn { display: inline-grid; }
+  nav ul {
+    display: none;
+    position: absolute;
+    top: var(--nav-h); left: 0; right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-md);
+  }
+  nav ul.open { display: flex; }
+  nav li a { display: block; padding: 14px var(--gutter); }
+  nav a.current::after { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   3. Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: calc(var(--nav-h) + 40px) 0 72px;
+}
+#sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 160px;
+  background: linear-gradient(transparent, var(--bg));
+  pointer-events: none;
+}
+.hero .wrap { position: relative; z-index: 1; width: 100%; }
+
+/* Mono eyebrow — the label on a drawing. */
+.eyebrow {
+  font: 500 .8rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::after {
+  content: "";
+  flex: 0 0 56px;
+  height: 1px;
+  background: var(--accent-line);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 9vw, 6.4rem);
+  line-height: .94;
+  letter-spacing: -.045em;
+  font-weight: 760;
+  margin: 0 0 18px;
+}
+.hero h1 .ch { display: inline-block; }
+
+.role {
+  font-size: clamp(1.2rem, 3vw, 1.85rem);
+  font-weight: 450;
+  color: var(--muted);
+  margin: 0 0 22px;
+  min-height: 1.5em;
+}
+.role b { color: var(--text); font-weight: 600; }
+.caret {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--accent);
+  vertical-align: -.12em;
+  margin-left: 3px;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.lede { max-width: 54ch; color: var(--text-2); font-size: 1.1rem; margin: 0 0 32px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.scroll-hint {
+  position: absolute;
+  left: 50%; bottom: 26px;
+  z-index: 1;
+  transform: translateX(-50%);
+  font: 500 .78rem var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+.scroll-hint:hover { color: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   4. Buttons
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 .93rem var(--font-sans);
+  padding: 11px 21px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--surface);
+  cursor: pointer;
+  transition: transform var(--t-fast), background var(--t-fast),
+              border-color var(--t-fast), color var(--t-fast);
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--on-accent);
+}
+.btn.primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  transform: translateY(-1px);
+}
+.btn.small { padding: 7px 14px; font-size: .84rem; }
+.btn svg { width: 15px; height: 15px; }
+
+/* --------------------------------------------------------------------------
+   5. Sections and headings
+   -------------------------------------------------------------------------- */
+section.block { padding: 104px 0; }
+
+.sec-head { margin-bottom: 44px; }
+.sec-head .num, .contact .num {
+  font: 500 .8rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  color: var(--accent-strong);
+  display: block;
+  margin-bottom: 12px;
+}
+.contact .num { margin-bottom: 16px; }
+.sec-head h2 {
+  font-size: clamp(2rem, 4.6vw, 2.9rem);
+  letter-spacing: -.035em;
+  line-height: 1.05;
+  font-weight: 720;
+  margin: 0 0 10px;
+}
+.sec-head p { margin: 0; color: var(--muted); max-width: 58ch; }
+
+h3 {
+  font-size: 1.16rem;
+  font-weight: 620;
+  letter-spacing: -.01em;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+/* A sheet of paper laid on the blueprint. */
+.sheet {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --------------------------------------------------------------------------
+   6. About + spec panel
+   -------------------------------------------------------------------------- */
+.about { display: grid; grid-template-columns: 1.3fr 1fr; gap: 56px; align-items: start; }
+.about p { margin: 0 0 1em; max-width: 62ch; }
+.about p strong { color: var(--text); font-weight: 600; }
+
+.panel { padding: 6px 22px; }
+.panel dl { margin: 0; }
+.panel div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: .94rem;
+}
+.panel div:last-child { border: 0; }
+.panel dt {
+  color: var(--muted);
+  font: 500 .78rem/1.5 var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+.panel dd { margin: 0; text-align: right; font-weight: 550; color: var(--text); }
+
+@media (max-width: 880px) { .about { grid-template-columns: 1fr; gap: 32px; } }
+
+/* --------------------------------------------------------------------------
+   7. Experience timeline
+   -------------------------------------------------------------------------- */
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline::before, .timeline::after {
+  content: "";
+  position: absolute;
+  left: 7px; top: 8px; bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+}
+.timeline::before { background: var(--line); }
+/* The filled line tracks scroll position — set as --p by site.js. */
+.timeline::after {
+  background: linear-gradient(var(--accent), var(--signal));
+  transform-origin: top;
+  transform: scaleY(var(--p, 0));
+}
+.timeline > li { position: relative; padding: 0 0 40px 44px; }
+.timeline > li:last-child { padding-bottom: 0; }
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  z-index: 1;
+  transition: border-color var(--t-slow), box-shadow var(--t-slow);
+}
+.timeline > li.lit::before {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px var(--accent-soft);
+}
+
+.job { padding: 20px 22px; }
+.job-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.when {
+  font: 500 .8rem var(--font-mono);
+  color: var(--accent-strong);
+  white-space: nowrap;
+  padding-top: 3px;
+}
+.org { color: var(--muted); font-size: .93rem; margin: 0 0 10px; }
+.job ul { margin: 0; padding-left: 1.1em; color: var(--text-2); font-size: .97rem; }
+.job li { margin-bottom: 5px; }
+.job li::marker { color: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   8. Projects: filters, cards, modal
+   -------------------------------------------------------------------------- */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; align-items: center; }
+.toolbar .label {
+  font: 500 .75rem var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.chip {
+  font: 500 .86rem var(--font-sans);
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+.chip:hover { color: var(--text); border-color: var(--muted); }
+.chip[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.chip.small { padding: 5px 11px; font-size: .8rem; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-mid), transform var(--t-mid), box-shadow var(--t-mid);
+}
+.card:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.card.featured { grid-column: span 2; }
+.card.featured .thumb { aspect-ratio: 21 / 8; }
+
+.thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--t-slow); }
+.card:hover .thumb img { transform: scale(1.04); }
+/* Placeholder: a scrap of the blueprint grid plus a drawn icon. */
+.thumb .ph {
+  width: 100%; height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  opacity: .5;
+  background-image:
+    linear-gradient(var(--grid-c1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-c1) 1px, transparent 1px);
+  background-size: var(--grid-major) var(--grid-major);
+}
+
+.card .body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font: 500 .76rem var(--font-mono);
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+.meta .cat { color: var(--signal); }
+.card p { margin: 0 0 16px; color: var(--text-2); font-size: .95rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tags span {
+  font: 400 .76rem var(--font-mono);
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line-soft);
+}
+
+.status-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 .72rem var(--font-mono);
+  letter-spacing: .04em;
+  padding: 4px 10px 4px 8px;
+  border-radius: var(--r-pill);
+  background: var(--nav-glass);
+  border: 1px solid var(--line);
+  color: var(--text);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.status-badge::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.status-badge[data-s="Completed"]::before { background: var(--ok); }
+.status-badge[data-s="Planned"]::before { background: var(--planned); }
+.status-badge[data-s="In progress"]::before {
+  background: var(--accent);
+  animation: ping 2s infinite;
+}
+@keyframes ping {
+  0%   { box-shadow: 0 0 0 0 var(--accent-soft); }
+  70%  { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* The whole card is a link to the project page (the "stretched link" pattern:
+   a real <a> on the title, expanded to cover the card). The Quick look button
+   sits above it, so both stay keyboard-reachable and the HTML stays valid. */
+.card h3 { margin-bottom: 8px; }
+.card h3 a.stretch { color: inherit; text-decoration: none; }
+.card h3 a.stretch::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.card:hover h3 a.stretch { color: var(--accent-strong); }
+
+.peek {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  margin-top: 14px;
+  font: 500 .78rem var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.peek:hover { color: var(--accent-strong); border-color: var(--accent-line); }
+
+.status { color: var(--muted); padding: 24px 0; }
+
+@media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .card.featured { grid-column: auto; }
+}
+
+/* Modal (quick look) */
+dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text-2);
+  padding: 0;
+  width: min(720px, calc(100% - 32px));
+  max-height: 88vh;
+  box-shadow: var(--shadow-md);
+}
+dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(4px); }
+dialog[open] { animation: pop .25s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+.m-img img { width: 100%; max-height: 320px; object-fit: cover; }
+.m-body { padding: 24px 26px 26px; }
+.m-body h3 { font-size: 1.55rem; letter-spacing: -.02em; }
+.m-body ul { padding-left: 1.1em; color: var(--text-2); }
+.m-body li { margin-bottom: 6px; }
+.m-body li::marker { color: var(--accent); }
+.m-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--nav-glass);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+/* --------------------------------------------------------------------------
+   9. Skills
+   -------------------------------------------------------------------------- */
+.skills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.skill { padding: 20px; }
+.skill h3 {
+  font: 500 .78rem/1 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 14px;
+}
+.skill ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 7px; }
+.skill li {
+  font-size: .85rem;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  color: var(--text-2);
+}
+@media (max-width: 980px) { .skills { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .skills { grid-template-columns: 1fr; } }
+
+/* --------------------------------------------------------------------------
+   10. Resume
+   -------------------------------------------------------------------------- */
+.resume { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: start; }
+.doc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.doc h3 { margin: 0; }
+.doc .muted { font: 400 .8rem var(--font-mono); }
+.doc .btns { display: flex; gap: 8px; }
+
+.certs { list-style: none; padding: 0; margin: 28px 0 0; }
+.certs li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: .94rem;
+}
+.certs li:last-child { border: 0; }
+.certs span { color: var(--muted); text-align: right; font: 400 .82rem var(--font-mono); }
+
+.preview { overflow: hidden; aspect-ratio: 1 / 1.35; }
+.preview object { width: 100%; height: 100%; }
+@media (max-width: 900px) { .resume { grid-template-columns: 1fr; } .preview { display: none; } }
+
+/* --------------------------------------------------------------------------
+   11. Contact + footer
+   -------------------------------------------------------------------------- */
+.contact { text-align: center; }
+.contact h2 {
+  font-size: clamp(2.3rem, 6vw, 4rem);
+  letter-spacing: -.045em;
+  line-height: 1.02;
+  margin: 0 0 18px;
+  font-weight: 740;
+}
+.contact p { color: var(--muted); max-width: 50ch; margin: 0 auto 30px; }
+.contact .actions { justify-content: center; }
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 24px 0;
+  font: 400 .82rem var(--font-mono);
+  color: var(--muted);
+  background: var(--bg);
+}
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* --------------------------------------------------------------------------
+   12. Motion — entrances, and the reduced-motion contract
+   -------------------------------------------------------------------------- */
+.js .hero h1 .ch { opacity: 0; transform: translateY(.5em); }
+.js.ready .hero h1 .ch {
+  opacity: 1;
+  transform: none;
+  transition: opacity .5s ease, transform .7s var(--ease);
+  transition-delay: calc(var(--i) * 35ms + 150ms);
+}
+.js .eyebrow, .js .role, .js .lede, .js .hero .actions { opacity: 0; transform: translateY(14px); }
+.js.ready .hero .eyebrow { opacity: 1; transform: none; transition: all var(--t-slow) ease; }
+.js.ready .role,
+.js.ready .lede,
+.js.ready .hero .actions {
+  opacity: 1;
+  transform: none;
+  transition: opacity .7s ease .55s, transform .7s ease .55s;
+}
+.js .reveal { opacity: 0; transform: translateY(22px); }
+.js .reveal.in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .8s ease, transform .8s var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  /* Gentle mode: things still fade, but nothing slides, lifts or pulses. */
+  .js .hero h1 .ch, .js .eyebrow, .js .role, .js .lede,
+  .js .hero .actions, .js .reveal { transform: none !important; }
+  .card:hover { transform: none; }
+  .card:hover .thumb img { transform: none; }
+  .btn.primary:hover { transform: none; }
+  .status-badge::before { animation: none !important; }
+  .caret { animation: none; }
+  dialog[open] { animation: none; }
+  body::before { mask-image: none; -webkit-mask-image: none; }
+}

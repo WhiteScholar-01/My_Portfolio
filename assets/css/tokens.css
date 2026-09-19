@@ -1,0 +1,150 @@
+/* ==========================================================================
+   tokens.css — the Blueprint design system
+   --------------------------------------------------------------------------
+   One place for every colour, font, radius and spacing value on the site.
+   Change a value here and it changes everywhere.
+
+   COLOUR THEORY
+   Ground:  a warm, very low-chroma ivory (light) / deep ink navy (dark).
+            Low chroma means the ground never competes with the content.
+   Accent:  copper — hue ~25-30 degrees. Chosen because it is literally the
+            material of motor windings and antenna elements.
+   Signal:  teal-blue — hue ~195 degrees, near the complement of copper.
+            Reserved for data: categories, links to live things, the beam.
+   Because ground is near-neutral and only two hues carry chroma, every
+   coloured thing on the page reads as meaningful rather than decorative.
+
+   Each theme keeps identical token NAMES, so components never branch.
+   ========================================================================== */
+
+:root {
+  /* ---- type ---- */
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- geometry ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+  --wrap: 1140px;
+  --gutter: 24px;
+  --nav-h: 64px;
+
+  /* ---- motion ---- */
+  --t-fast: .18s;
+  --t-mid: .28s;
+  --t-slow: .6s;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* ---- grid overlay (the "blueprint" texture) ---- */
+  --grid-minor: 8px;
+  --grid-major: 48px;
+}
+
+/* ==========================================================================
+   LIGHT — "paper". The default.
+   ========================================================================== */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #F5F2EB;          /* ivory drawing paper                       */
+  --surface: #FFFDF8;     /* a sheet laid on top of the paper          */
+  --surface-2: #EDE8DD;   /* recessed wells: tags, thumbnails          */
+  --line: #D8D0C0;        /* hairline rules                            */
+  --line-soft: #E6DFD2;   /* the fainter half of the grid              */
+
+  --text: #12233A;        /* ink          14.9:1 on bg                 */
+  --text-2: #33455C;      /* body copy     8.8:1 on bg                 */
+  --muted: #5C6B84;       /* labels        4.6:1 on bg (AA)            */
+
+  --accent: #B4652A;      /* copper — fills, borders, large type       */
+  --accent-strong: #8F4E1C; /* copper for small text  5.7:1 (AA)       */
+  --accent-soft: rgba(180, 101, 42, .11);
+  --accent-line: rgba(180, 101, 42, .38);
+  --on-accent: #F5F2EB;   /* label colour on an --accent-strong fill   */
+
+  --signal: #1F6F8B;      /* teal-blue    5.1:1 on bg (AA)             */
+  --signal-soft: rgba(31, 111, 139, .10);
+
+  --ok: #2F7D52;
+  --planned: #1F6F8B;
+
+  --shadow-sm: 0 1px 2px rgba(18, 35, 58, .06);
+  --shadow-md: 0 8px 26px -14px rgba(18, 35, 58, .28);
+
+  --grid-c1: rgba(18, 35, 58, .045);  /* major rule  */
+  --grid-c2: rgba(18, 35, 58, .022);  /* minor rule  */
+  --nav-glass: rgba(245, 242, 235, .86);
+  --backdrop: rgba(18, 35, 58, .34);
+}
+
+/* ==========================================================================
+   DARK — "night". Same drawing, lit differently.
+   ========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0A1420;
+  --surface: #11202F;
+  --surface-2: #17293B;
+  --line: #263D54;
+  --line-soft: #1C3145;
+
+  --text: #E8EEF5;        /* 15.9:1 on bg */
+  --text-2: #C6D3E2;      /* 12.2:1 on bg */
+  --muted: #93A7BC;       /*  7.5:1 on bg */
+
+  --accent: #E7A15A;      /*  8.5:1 on bg */
+  --accent-strong: #EFB877;
+  --accent-soft: rgba(231, 161, 90, .14);
+  --accent-line: rgba(231, 161, 90, .45);
+  --on-accent: #0A1420;
+
+  --signal: #63B8D6;      /*  8.3:1 on bg */
+  --signal-soft: rgba(99, 184, 214, .13);
+
+  --ok: #6FCF97;
+  --planned: #63B8D6;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+  --shadow-md: 0 10px 30px -16px rgba(0, 0, 0, .8);
+
+  --grid-c1: rgba(200, 222, 245, .050);
+  --grid-c2: rgba(200, 222, 245, .022);
+  --nav-glass: rgba(10, 20, 32, .84);
+  --backdrop: rgba(3, 8, 14, .7);
+}
+
+/* Follow the operating system until the visitor picks a theme themselves.
+   The [data-theme] blocks above always win, because an explicit choice
+   should outrank a system default. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #0A1420;
+    --surface: #11202F;
+    --surface-2: #17293B;
+    --line: #263D54;
+    --line-soft: #1C3145;
+    --text: #E8EEF5;
+    --text-2: #C6D3E2;
+    --muted: #93A7BC;
+    --accent: #E7A15A;
+    --accent-strong: #EFB877;
+    --accent-soft: rgba(231, 161, 90, .14);
+    --accent-line: rgba(231, 161, 90, .45);
+    --on-accent: #0A1420;
+    --signal: #63B8D6;
+    --signal-soft: rgba(99, 184, 214, .13);
+    --ok: #6FCF97;
+    --planned: #63B8D6;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+    --shadow-md: 0 10px 30px -16px rgba(0, 0, 0, .8);
+    --grid-c1: rgba(200, 222, 245, .050);
+    --grid-c2: rgba(200, 222, 245, .022);
+    --nav-glass: rgba(10, 20, 32, .84);
+    --backdrop: rgba(3, 8, 14, .7);
+  }
+}
