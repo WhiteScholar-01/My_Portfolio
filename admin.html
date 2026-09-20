@@ -92,13 +92,48 @@
         <label class="full">Highlights <span class="hint">one per line — these become "What I did"</span>
           <textarea name="details"></textarea></label>
 
+        <!-- ---------- extra sections ---------- -->
+        <div class="full editor">
+          <div class="ed-head">
+            <span class="ed-title">Sections</span>
+            <span class="hint">your own headings on the project page</span>
+            <button class="btn small" type="button" id="addSection">Add section</button>
+          </div>
+          <div id="sectionRows"></div>
+        </div>
+
+        <!-- ---------- gallery ---------- -->
+        <div class="full editor">
+          <div class="ed-head">
+            <span class="ed-title">Gallery</span>
+            <span class="hint">images beyond the cover</span>
+            <label class="btn small file-btn">Upload images
+              <input type="file" id="galleryFiles" accept="image/*" multiple></label>
+            <button class="btn small" type="button" id="scanBtn">Scan folder</button>
+          </div>
+          <div id="galleryRows"></div>
+          <p class="msg" id="galleryMsg" role="status"></p>
+        </div>
+
+        <!-- ---------- attachments ---------- -->
+        <div class="full editor">
+          <div class="ed-head">
+            <span class="ed-title">Downloads</span>
+            <span class="hint">manual, model file, report</span>
+            <label class="btn small file-btn">Upload files
+              <input type="file" id="docFiles" multiple></label>
+          </div>
+          <div id="fileRows"></div>
+          <p class="msg" id="filesMsg" role="status"></p>
+        </div>
+
         <label class="full">Tags <span class="hint">comma separated</span>
           <input name="tags" placeholder="MATLAB, Simulink, FOC"></label>
 
         <label>Code link<input type="url" name="code_url" placeholder="https://github.com/WhiteScholar-01/..."></label>
         <label>Live demo or report link<input type="url" name="demo_url"></label>
 
-        <label class="full">Image path <span class="hint">filled in after upload, or type projects/&lt;slug&gt;/images/file.jpg</span>
+        <label class="full">Cover image path <span class="hint">filled in after upload, or type projects/&lt;slug&gt;/images/file.jpg</span>
           <input name="image"></label>
         <div class="full" id="imgPreview"></div>
 
@@ -134,6 +169,12 @@
       <button class="btn small" id="discardBtn">Discard</button>
       <button class="btn primary" id="publishBtn">Publish to site</button>
     </div>
+  </div>
+  <!-- This page writes to GitHub, never to your disk. -->
+  <div class="inner pull-note" id="pullNote" hidden>
+    <span>Your computer doesn't have these changes yet — run
+      <code>git pull</code> in your local folder.</span>
+    <button class="btn small" type="button" id="copyPull">Copy</button>
   </div>
 </div>
 

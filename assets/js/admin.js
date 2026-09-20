@@ -7,9 +7,14 @@
 
    What it writes:
      data/projects.json                     the project list the site reads
-     projects/<slug>/images/<file>          uploaded images
+     projects/<slug>/images/<file>          cover and gallery images
+     projects/<slug>/<file>                 attachments (PDF, .slx, reports)
      projects/<slug>/index.html             a page for a newly added project
      projects/<slug>/README.md              that project's notes file
+
+   IMPORTANT: this page writes to GitHub, never to your computer. After
+   publishing, run `git pull` in your local folder to bring the changes down.
+   A browser cannot write to your disk, so there is no way around that.
    ========================================================================== */
 
 import { $, esc, slugify } from "./util.js";
@@ -17,8 +22,14 @@ import { initTheme } from "./theme.js";
 
 const KEY  = "portfolio-admin";
 const DATA = "data/projects.json";
+const IMAGE_EXT = /\.(jpe?g|png|gif|webp|svg|avif)$/i;
 
-let cfg = null, sha = null, projects = [], saved = "[]", pendingImage = null;
+let cfg = null, sha = null, projects = [], saved = "[]", pendingCover = null;
+
+/* The three repeatable editors keep their rows here while you edit. */
+let draftGallery = [];   // [{src, caption}]
+let draftSections = [];  // [{heading, body}]
+let draftFiles = [];     // [{label, path, note}]
 
 const say = (el, text, ok) => {
   el.textContent = text;
@@ -133,6 +144,9 @@ function renderList() {
         <span class="slug">projects/${esc(p.slug)}/</span><br>
         <span class="pill" data-s="${esc(p.status)}">${esc(p.status || "No status")}</span>
         <span class="pill">${esc(p.category)}</span>
+        ${(p.gallery || []).length ? `<span class="pill">${p.gallery.length} image${p.gallery.length > 1 ? "s" : ""}</span>` : ""}
+        ${(p.sections || []).length ? `<span class="pill">${p.sections.length} section${p.sections.length > 1 ? "s" : ""}</span>` : ""}
+        ${(p.files || []).length ? `<span class="pill">${p.files.length} file${p.files.length > 1 ? "s" : ""}</span>` : ""}
         ${p.published === false ? `<span class="pill hidden">Hidden</span>` : ""}
         ${p.featured ? `<span class="pill">Featured</span>` : ""}
       </div>
@@ -178,6 +192,12 @@ function fillForm(p, i) {
   form.tags.value = (p.tags || []).join(", ");
   form.published.checked = p.published !== false;
   form.featured.checked = !!p.featured;
+
+  draftGallery = (p.gallery || []).map(g => typeof g === "string" ? { src: g, caption: "" } : { ...g });
+  draftSections = (p.sections || []).map(s => ({ ...s }));
+  draftFiles = (p.files || []).map(f => ({ ...f }));
+  renderGallery(); renderSections(); renderFiles();
+
   $("#formTitle").textContent = "Edit project";
   $("#addBtn").textContent = "Update in list";
   showPreview(p.image ? rawUrl(p.image) : "");
@@ -186,7 +206,9 @@ function fillForm(p, i) {
 function clearForm() {
   form.reset();
   form.index.value = "";
-  pendingImage = null;
+  pendingCover = null;
+  draftGallery = []; draftSections = []; draftFiles = [];
+  renderGallery(); renderSections(); renderFiles();
   $("#formTitle").textContent = "Add a project";
   $("#addBtn").textContent = "Add to list";
   $("#imgPreview").innerHTML = "";
@@ -207,6 +229,17 @@ const rawUrl = path => /^https?:/.test(path)
 
 const showPreview = src =>
   $("#imgPreview").innerHTML = src ? `<img class="preview-img" src="${esc(src)}" alt="">` : "";
+
+/** The slug the uploads should go under. Warns if there isn't one yet. */
+function currentSlug(msgEl) {
+  const s = slugify(form.slug.value || form.title.value);
+  if (!s || s === "project") {
+    if (msgEl) say(msgEl, "Give the project a title first — uploads need a folder name.", false);
+    return null;
+  }
+  form.slug.value = s;
+  return s;
+}
 
 /* Resize big photos in the browser before uploading, so the site stays fast. */
 function resizeImage(file, maxW = 1400) {
@@ -234,35 +267,256 @@ function resizeImage(file, maxW = 1400) {
   });
 }
 
+/** Read any file (PDF, .slx, zip) as base64 without touching its bytes. */
+const readAsB64 = file => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = () => resolve(r.result.split(",")[1]);
+  r.onerror = reject;
+  r.readAsDataURL(file);
+});
+
+/* ---- cover image: uploaded when you press Add to list ---- */
 form.file.onchange = async () => {
   const f = form.file.files[0];
   if (!f) return;
   try {
-    pendingImage = await resizeImage(f);
-    showPreview(pendingImage.preview || URL.createObjectURL(f));
-    say($("#formMsg"), "Image ready. It uploads when you add the project.", true);
+    pendingCover = await resizeImage(f);
+    showPreview(pendingCover.preview || URL.createObjectURL(f));
+    say($("#formMsg"), "Cover ready. It uploads when you add the project.", true);
   } catch (err) {
     say($("#formMsg"), err.message);
-    pendingImage = null;
+    pendingCover = null;
   }
 };
 
+/* --------------------------------------------------------------------------
+   Gallery editor
+   -------------------------------------------------------------------------- */
+function renderGallery() {
+  const wrap = $("#galleryRows");
+  if (!draftGallery.length) {
+    wrap.innerHTML = `<p class="hint">No extra images. Upload some, or press Scan folder to pick up files you added by hand.</p>`;
+    return;
+  }
+  wrap.innerHTML = draftGallery.map((g, i) => `
+    <div class="ed-row">
+      <img class="ed-thumb" src="${esc(cfg ? rawUrl(g.src) : g.src)}" alt="">
+      <div class="ed-fields">
+        <input class="ed-path" value="${esc(g.src)}" data-i="${i}" data-k="src" aria-label="Image path">
+        <input value="${esc(g.caption || "")}" data-i="${i}" data-k="caption" placeholder="Caption (optional)" aria-label="Caption">
+      </div>
+      <div class="ed-btns">
+        <button class="btn icon" type="button" data-gup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button>
+        <button class="btn icon" type="button" data-gdown="${i}" ${i === draftGallery.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button>
+        <button class="btn icon danger" type="button" data-gdel="${i}" aria-label="Remove">✕</button>
+      </div>
+    </div>`).join("");
+}
+
+$("#galleryRows").addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.k) draftGallery[+el.dataset.i][el.dataset.k] = el.value;
+});
+$("#galleryRows").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const d = b.dataset;
+  if (d.gup)   { const i = +d.gup;   [draftGallery[i - 1], draftGallery[i]] = [draftGallery[i], draftGallery[i - 1]]; }
+  if (d.gdown) { const i = +d.gdown; [draftGallery[i + 1], draftGallery[i]] = [draftGallery[i], draftGallery[i + 1]]; }
+  if (d.gdel)  draftGallery.splice(+d.gdel, 1);
+  renderGallery();
+});
+
+/* Upload several images at once, straight into this project's images folder. */
+$("#galleryFiles").onchange = async e => {
+  const files = [...e.target.files];
+  e.target.value = "";
+  if (!files.length) return;
+  const msg = $("#galleryMsg");
+  const slug = currentSlug(msg);
+  if (!slug) return;
+
+  let n = 0;
+  for (const f of files) {
+    try {
+      say(msg, `Uploading ${++n} of ${files.length}: ${f.name}…`, true);
+      const img = await resizeImage(f);
+      const path = `projects/${slug}/images/${slugify(f.name.replace(/\.[^.]+$/, ""))}-${Date.now().toString(36)}.${img.ext}`;
+      await put(path, img.b64, `Add image ${path}`);
+      draftGallery.push({ src: path, caption: "" });
+      renderGallery();
+    } catch (err) {
+      say(msg, `${f.name}: ${err.message}`, false);
+      return;
+    }
+  }
+  say(msg, `Uploaded ${files.length} image${files.length > 1 ? "s" : ""}. Add captions, then press ${form.index.value === "" ? "Add to list" : "Update in list"}.`, true);
+};
+
+/* Pick up images that are already in the folder on GitHub — the ones you
+   copied in locally and pushed. */
+$("#scanBtn").onclick = async () => {
+  const msg = $("#galleryMsg");
+  const slug = currentSlug(msg);
+  if (!slug) return;
+  const btn = $("#scanBtn");
+  btn.disabled = true;
+  try {
+    say(msg, "Reading the folder on GitHub…", true);
+    const listing = await gh(`projects/${slug}/images?ref=${encodeURIComponent(cfg.branch)}`, {}, true);
+    if (!Array.isArray(listing)) {
+      say(msg, `projects/${slug}/images/ doesn't exist on GitHub yet. Push your local files first.`, false);
+    } else {
+      const known = new Set([form.image.value.trim(), ...draftGallery.map(g => g.src)]);
+      const found = listing
+        .filter(f => f.type === "file" && IMAGE_EXT.test(f.name))
+        .map(f => f.path)
+        .filter(p => !known.has(p));
+      found.forEach(src => draftGallery.push({ src, caption: "" }));
+      renderGallery();
+      say(msg, found.length
+        ? `Added ${found.length} image${found.length > 1 ? "s" : ""} from the folder.`
+        : "Nothing new in that folder — everything there is already listed.", true);
+    }
+  } catch (err) {
+    say(msg, err.message, false);
+  }
+  btn.disabled = false;
+};
+
+/* --------------------------------------------------------------------------
+   Sections editor
+   -------------------------------------------------------------------------- */
+function renderSections() {
+  const wrap = $("#sectionRows");
+  if (!draftSections.length) {
+    wrap.innerHTML = `<p class="hint">No extra sections. Add one for Results, Theory, References — anything that deserves its own heading.</p>`;
+    return;
+  }
+  wrap.innerHTML = draftSections.map((s, i) => `
+    <div class="ed-row col">
+      <div class="ed-top">
+        <input value="${esc(s.heading || "")}" data-i="${i}" data-k="heading" placeholder="Heading, e.g. Results" aria-label="Section heading">
+        <div class="ed-btns">
+          <button class="btn icon" type="button" data-sup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button>
+          <button class="btn icon" type="button" data-sdown="${i}" ${i === draftSections.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button>
+          <button class="btn icon danger" type="button" data-sdel="${i}" aria-label="Remove">✕</button>
+        </div>
+      </div>
+      <textarea data-i="${i}" data-k="body" placeholder="Text. Blank line starts a new paragraph; lines starting with - become bullets." aria-label="Section text">${esc(s.body || "")}</textarea>
+    </div>`).join("");
+}
+
+$("#sectionRows").addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.k) draftSections[+el.dataset.i][el.dataset.k] = el.value;
+});
+$("#sectionRows").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const d = b.dataset;
+  if (d.sup)   { const i = +d.sup;   [draftSections[i - 1], draftSections[i]] = [draftSections[i], draftSections[i - 1]]; }
+  if (d.sdown) { const i = +d.sdown; [draftSections[i + 1], draftSections[i]] = [draftSections[i], draftSections[i + 1]]; }
+  if (d.sdel)  draftSections.splice(+d.sdel, 1);
+  renderSections();
+});
+$("#addSection").onclick = () => {
+  draftSections.push({ heading: "", body: "" });
+  renderSections();
+  $("#sectionRows").querySelector(".ed-row:last-child input")?.focus();
+};
+
+/* --------------------------------------------------------------------------
+   Attachments editor
+   -------------------------------------------------------------------------- */
+function renderFiles() {
+  const wrap = $("#fileRows");
+  if (!draftFiles.length) {
+    wrap.innerHTML = `<p class="hint">No attachments. Upload a manual, a model file or a report to offer it as a download.</p>`;
+    return;
+  }
+  wrap.innerHTML = draftFiles.map((f, i) => `
+    <div class="ed-row">
+      <span class="ed-ext">${esc((f.path.split(".").pop() || "").toUpperCase().slice(0, 5))}</span>
+      <div class="ed-fields">
+        <input value="${esc(f.label || "")}" data-i="${i}" data-k="label" placeholder="Label, e.g. Construction manual" aria-label="File label">
+        <input value="${esc(f.note || "")}" data-i="${i}" data-k="note" placeholder="Note, e.g. 12 pages · PDF" aria-label="File note">
+        <input class="ed-path" value="${esc(f.path)}" data-i="${i}" data-k="path" aria-label="File path">
+      </div>
+      <div class="ed-btns">
+        <button class="btn icon" type="button" data-fup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button>
+        <button class="btn icon" type="button" data-fdown="${i}" ${i === draftFiles.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button>
+        <button class="btn icon danger" type="button" data-fdel="${i}" aria-label="Remove">✕</button>
+      </div>
+    </div>`).join("");
+}
+
+$("#fileRows").addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.k) draftFiles[+el.dataset.i][el.dataset.k] = el.value;
+});
+$("#fileRows").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const d = b.dataset;
+  if (d.fup)   { const i = +d.fup;   [draftFiles[i - 1], draftFiles[i]] = [draftFiles[i], draftFiles[i - 1]]; }
+  if (d.fdown) { const i = +d.fdown; [draftFiles[i + 1], draftFiles[i]] = [draftFiles[i], draftFiles[i + 1]]; }
+  if (d.fdel)  draftFiles.splice(+d.fdel, 1);
+  renderFiles();
+});
+
+$("#docFiles").onchange = async e => {
+  const files = [...e.target.files];
+  e.target.value = "";
+  if (!files.length) return;
+  const msg = $("#filesMsg");
+  const slug = currentSlug(msg);
+  if (!slug) return;
+
+  for (const f of files) {
+    // GitHub's contents API is happy up to ~25 MB through this route.
+    if (f.size > 25 * 1024 * 1024) {
+      say(msg, `${f.name} is ${(f.size / 1048576).toFixed(1)} MB — too big to upload here. Add it with git instead.`, false);
+      return;
+    }
+    try {
+      say(msg, `Uploading ${f.name}…`, true);
+      const b64 = await readAsB64(f);
+      const path = `projects/${slug}/${f.name.replace(/[^\w.\-]+/g, "_")}`;
+      const existing = await gh(`${path}?ref=${encodeURIComponent(cfg.branch)}`, {}, true);
+      await put(path, b64, `Add ${path}`, existing?.sha);
+      draftFiles.push({
+        label: f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "),
+        path,
+        note: `${(f.size / 1048576).toFixed(1)} MB`
+      });
+      renderFiles();
+    } catch (err) {
+      say(msg, `${f.name}: ${err.message}`, false);
+      return;
+    }
+  }
+  say(msg, `Uploaded ${files.length} file${files.length > 1 ? "s" : ""}. Edit the labels, then update the project.`, true);
+};
+
+/* --------------------------------------------------------------------------
+   Save the form into the list
+   -------------------------------------------------------------------------- */
 form.onsubmit = async e => {
   e.preventDefault();
   const msg = $("#formMsg");
   $("#addBtn").disabled = true;
   try {
-    const slug = slugify(form.slug.value || form.title.value);
-    form.slug.value = slug;
+    const slug = currentSlug(msg);
+    if (!slug) { $("#addBtn").disabled = false; return; }
 
     let image = form.image.value.trim();
-    if (pendingImage) {
-      say(msg, "Uploading image…", true);
-      // Images live with their project, not in one shared bucket.
-      const path = `projects/${slug}/images/cover-${Date.now().toString(36)}.${pendingImage.ext}`;
-      await put(path, pendingImage.b64, `Add image ${path}`);
+    if (pendingCover) {
+      say(msg, "Uploading cover…", true);
+      const path = `projects/${slug}/images/cover-${Date.now().toString(36)}.${pendingCover.ext}`;
+      await put(path, pendingCover.b64, `Add image ${path}`);
       image = path;
-      pendingImage = null;
+      pendingCover = null;
     }
 
     const p = {
@@ -278,7 +532,11 @@ form.onsubmit = async e => {
       details: form.details.value.split("\n").map(s => s.trim()).filter(Boolean),
       tags: form.tags.value.split(",").map(s => s.trim()).filter(Boolean),
       image,
-      gallery: (projects[+form.index.value]?.gallery) || [],
+      gallery: draftGallery.filter(g => g.src.trim()).map(g => ({ src: g.src.trim(), caption: (g.caption || "").trim() })),
+      sections: draftSections.filter(s => (s.heading || "").trim() || (s.body || "").trim())
+                             .map(s => ({ heading: (s.heading || "").trim(), body: (s.body || "").trim() })),
+      files: draftFiles.filter(f => (f.path || "").trim())
+                       .map(f => ({ label: (f.label || "").trim(), path: f.path.trim(), note: (f.note || "").trim() })),
       code_url: form.code_url.value.trim(),
       demo_url: form.demo_url.value.trim()
     };
@@ -291,7 +549,7 @@ form.onsubmit = async e => {
     slugTouched = false;
     say(msg, `"${p.title}" ${i === "" ? "added" : "updated"}. Press Publish when you're done.`, true);
   } catch (err) {
-    say(msg, "Couldn't upload the image: " + err.message);
+    say(msg, "Couldn't save: " + err.message);
   }
   $("#addBtn").disabled = false;
 };
@@ -325,7 +583,6 @@ async function ensurePages(report) {
 
     report(`Creating projects/${p.slug}/ …`);
     await put(path, toB64(fill(page, {
-      SLUG: p.slug,
       TITLE: esc(p.title),
       DESC: esc(p.summary),
       CATEGORY: esc(p.category || "Project")
@@ -352,6 +609,7 @@ const isDirty = () => JSON.stringify(projects) !== saved;
 function dirtyCheck() {
   $("#savebar").classList.toggle("on", isDirty());
   $("#saveText").textContent = "You have unpublished changes.";
+  $("#pullNote").hidden = true;
 }
 
 $("#discardBtn").onclick = () => {
@@ -380,12 +638,21 @@ $("#publishBtn").onclick = async () => {
     out.textContent = made
       ? `Published, and created ${made} new project folder${made > 1 ? "s" : ""}. The site updates in 1–2 minutes.`
       : "Published. The site updates in 1–2 minutes.";
-    setTimeout(dirtyCheck, 5000);
+    // Everything above happened on GitHub. Remind me to bring it down.
+    $("#pullNote").hidden = false;
     $("#savebar").classList.add("on");
   } catch (err) {
     out.textContent = "Couldn't publish: " + err.message;
   }
   btn.disabled = false;
+};
+
+$("#copyPull").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText("git pull");
+    $("#copyPull").textContent = "Copied";
+    setTimeout(() => $("#copyPull").textContent = "Copy", 1600);
+  } catch { /* clipboard blocked: the text is on screen anyway */ }
 };
 
 addEventListener("beforeunload", e => {
@@ -396,5 +663,6 @@ addEventListener("beforeunload", e => {
    Boot
    -------------------------------------------------------------------------- */
 initTheme();
+renderGallery(); renderSections(); renderFiles();
 const stored = localStorage.getItem(KEY) || sessionStorage.getItem(KEY);
 if (stored) { cfg = JSON.parse(stored); connectAndLoad(); }

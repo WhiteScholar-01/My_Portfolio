@@ -100,6 +100,11 @@
 .gallery figure { margin: 0; }
 .gallery img {
   width: 100%;
+  /* Plots and screenshots come in every shape. Cap the height and letterbox
+     rather than cropping — a trimmed axis label helps nobody. */
+  max-height: 460px;
+  object-fit: contain;
+  object-position: top;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--surface-2);
@@ -125,6 +130,41 @@
     linear-gradient(90deg, var(--grid-c1) 1px, transparent 1px);
   background-size: var(--grid-major) var(--grid-major);
 }
+
+/* Body copy inside a custom section */
+.p-section p { margin: 0 0 1em; color: var(--text-2); max-width: 66ch; }
+.p-section p:last-child { margin-bottom: 0; }
+
+/* Downloads: a manual, a model file, a report */
+.dl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text);
+}
+.side .sheet .dl:first-of-type { border-top: 0; padding-top: 2px; }
+.dl:hover .dl-text b { color: var(--accent-strong); }
+.dl-ext {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 6px 7px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  color: var(--accent-strong);
+  font: 500 .68rem var(--font-mono);
+  letter-spacing: .06em;
+}
+.dl-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dl-text b { font-size: .92rem; font-weight: 600; line-height: 1.25; }
+.dl-text span { font: 400 .76rem var(--font-mono); color: var(--muted); }
+
+.gallery a { display: block; text-decoration: none; }
 
 .side .sheet { padding: 18px 20px; margin-bottom: 16px; }
 .side h3 {

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- EDIT THESE TWO LINES when you copy this folder for a new project -->
+<!-- Only these two lines are worth editing when you copy this folder.
+     Everything else, including which project this is, comes from the
+     folder name and data/projects.json. -->
 <title>Five-phase IPMSM field-oriented control — Saqib Ali</title>
 <meta name="description" content="Modelling and control of a five-phase interior permanent magnet synchronous motor, from Simulink to TI DSP hardware at IIT Ropar.">
 <!-- ---------------------------------------------------------------- -->
@@ -33,10 +35,7 @@
 })();
 </script>
 </head>
-
-<!-- data-project is the slug. It must match this folder's name and the
-     "slug" field in data/projects.json. -->
-<body data-project="five-phase-ipmsm-foc">
+<body>
 
 <header class="top scrolled" id="topbar">
   <div class="wrap">
@@ -82,6 +81,10 @@
           <h2>What I did</h2>
           <div id="pHighlights"></div>
         </div>
+
+        <!-- Your own headed blocks, from the "sections" field -->
+        <div id="pSections"></div>
+
         <div class="p-section">
           <h2>Images</h2>
           <div id="pGallery"></div>
@@ -93,6 +96,8 @@
           <h3>Tools</h3>
           <div id="pTags"></div>
         </div>
+        <!-- Attachments, from the "files" field -->
+        <div id="pFiles"></div>
         <div class="sheet">
           <h3>Links</h3>
           <div id="pLinks"></div>

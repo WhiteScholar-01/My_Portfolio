@@ -78,9 +78,6 @@ project page reads its own entry from it.
   "details": ["Bullet points", "shown under 'What I did'"],
   "tags": ["MMANA-GAL", "NEC", "UHF"],
   "image": "projects/cross-yagi-435mhz/images/cover.jpg",
-  "gallery": [
-    { "src": "projects/cross-yagi-435mhz/images/pattern.png", "caption": "Radiation pattern" }
-  ],
   "code_url": "",
   "demo_url": ""
 }
@@ -88,6 +85,28 @@ project page reads its own entry from it.
 
 Image paths are written **from the repository root**, so the same string works
 on the home page and on a project page.
+
+Three more fields are optional — leave them out and nothing breaks:
+
+```json
+"gallery": [
+  { "src": "projects/cross-yagi-435mhz/images/pattern.png", "caption": "Radiation pattern" }
+],
+"sections": [
+  { "heading": "Results", "body": "Measured 1.4:1 at 435 MHz.\n\n- Front-to-back 16 dB" }
+],
+"files": [
+  { "label": "Construction manual", "path": "projects/cross-yagi-435mhz/manual.pdf", "note": "12 pages · PDF" }
+]
+```
+
+- **gallery** — extra figures under the Images heading. A bare string works too.
+- **sections** — your own headings on the project page, between "What I did"
+  and the images. In `body`, a blank line starts a new paragraph and lines
+  beginning `-` become bullets. Everything is escaped, so text is never markup.
+- **files** — downloads in the sidebar: a manual, a model file, a report.
+
+All three have editors in `admin.html`; you rarely need to write them by hand.
 
 ### 2. `assets/css/tokens.css`
 
@@ -129,12 +148,25 @@ one yet, creates `projects/<slug>/index.html` and `README.md` for you.
 
 > The token is never sent anywhere except GitHub. Don't commit it.
 
+**The admin page writes to GitHub, never to your computer.** A browser cannot
+write to your disk, so after publishing, run `git pull` in this folder to bring
+the changes down. The save bar reminds you every time. Skip it for a while and
+your next `git push` will collide with work you made through the admin page.
+
 ### Add a project by hand
 
 1. Copy any folder in `projects/` and rename it to the new slug.
-2. In its `index.html`, edit the two lines marked `EDIT THESE TWO LINES`, and
-   set `data-project` on `<body>` to the new slug.
-3. Add a matching entry to `data/projects.json`.
+2. Open its `index.html` and edit the two lines marked at the top — the
+   `<title>` and the meta description. Nothing else needs changing: the page
+   works out which project it is **from its folder name**.
+3. Add a matching entry to `data/projects.json` with the same `slug`.
+
+### Add images you copied in by hand
+
+1. Drop them into `projects/<slug>/images/`, then commit and push.
+2. In `admin.html`, open that project and press **Scan folder** — it lists what
+   is actually in the folder on GitHub and adds anything not already shown.
+3. Caption them, update the project, publish.
 
 ### Change a colour
 
