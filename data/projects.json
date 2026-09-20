@@ -123,22 +123,30 @@
   {
     "slug": "dc-dc-boost-converter",
     "title": "DC-DC boost converter",
-    "year": "",
+    "year": "2025",
     "category": "Power electronics",
-    "org": "",
+    "org": "Coursework, AMU",
+    "status": "Completed",
     "featured": false,
     "published": true,
     "summary": "Simulink model analysing steady-state and transient response across duty cycles and loads.",
-    "details": [],
-    "tags": [
-      "Simulink",
-      "SMPS"
+    "details": [
+      "Open-loop boost converter modelled in Simscape Electrical: 20 V input, 10 kHz switching at 50% duty, 3.5 mH inductor and 572 µF output capacitor into a 200 Ω load",
+      "Measured 39.2 V output against the ideal Vin/(1−D) = 40 V, tracing the shortfall to the 0.8 V diode drop and the MOSFET's 0.1 Ω on-resistance",
+      "Verified continuous conduction mode: critical inductance is 1.25 mH, so the 3.5 mH choke holds inductor ripple to 0.29 A peak-to-peak on a 0.39 A average",
+      "Instrumented inductor, switch, diode and capacitor currents alongside inductor, switch and load voltages, with a Mean block averaging output voltage over one switching period",
+      "Diagnosed a startup failure mode: a lightly damped L-C pair (Q ≈ 40) driven by a hard duty step produced a 15 A inductor peak and 74 V output overshoot, both well beyond the ratings a 40 V, 0.4 A design would use",
+      "Fixed it by pre-charging the output capacitor to Vin and ramping duty from 0 to 0.5 over 100 ms through a PWM Generator, cutting the peak to 0.9 A and 40.1 V — a 17× reduction in inrush current"
     ],
-    "image": "",
+    "tags": [
+      "MATLAB",
+      "Simulink",
+      "Simscape Electrical"
+    ],
+    "image": "projects/dc-dc-boost-converter/images/cover-mu9f4fwc.jpg",
     "gallery": [],
     "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "demo_url": ""
   },
   {
     "slug": "weather-dashboard",
