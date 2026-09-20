@@ -106,26 +106,6 @@
     "status": "In progress"
   },
   {
-    "slug": "adaptive-pid-mount",
-    "title": "Adaptive PID for a high-inertia mount",
-    "year": "2025",
-    "category": "Control",
-    "org": "Orbitalink · AMU Innovation Foundation",
-    "featured": false,
-    "published": true,
-    "summary": "Adaptive controller that stabilises and precisely points a heavy antenna tracker, with AMU Innovation Foundation.",
-    "details": [],
-    "tags": [
-      "Adaptive control",
-      "System modelling"
-    ],
-    "image": "",
-    "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
-  },
-  {
     "slug": "sdr-image-downlink",
     "title": "Image downlink over software-defined radio",
     "year": "",
