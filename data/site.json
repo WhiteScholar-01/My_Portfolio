@@ -5,37 +5,59 @@
     "roles": [
       "Electrical engineer",
       "Lead engineer at Orbitalink",
-      "Motor drive researcher",
-      "Satellite tracker builder"
+      "Research intern @IIT Ropar",
+      "Ground Station Designer"
     ],
     "lede": "I lead antenna tracking system development at Orbitalink and research control for five-phase motor drives. Electrical Engineering at Aligarh Muslim University.",
     "ctaLabel": "View projects",
     "ctaHref": "#projects",
     "resumeLabel": "Download resume"
   },
-
   "stats": [
-    { "value": "8", "label": "Projects" },
-    { "value": "2", "label": "Years at Orbitalink" },
-    { "value": "2026", "label": "IIT Ropar internship" }
+    {
+      "value": "8",
+      "label": "Projects"
+    },
+    {
+      "value": "2",
+      "label": "Years at Orbitalink"
+    },
+    {
+      "value": "2026",
+      "label": "IIT Ropar internship"
+    }
   ],
-
   "about": {
-    "heading": "Where control, power and RF meet",
+    "heading": "Where control, hardware and RF meet",
     "paragraphs": [
-      "I'm an Electrical Engineering student at **Zakir Husain College of Engineering and Technology, AMU**, working where control systems, power electronics and RF meet.",
-      "At **Orbitalink** I lead antenna tracking systems end to end: a 435 MHz cross-Yagi antenna, a Fusion 360 chassis, motion firmware for hybrid servo drives, and adaptive control for a high-inertia mount.",
-      "At **IIT Ropar** I modelled a five-phase IPMSM, designed field-oriented control with loss-aware MTPA, and generated ePWM on a TI DSP to test the gate driver."
+      "A control law that works in Simulink and one that works on a real motor are not the same thing. Most of my work lives in the gap between them.",
+      "At **Orbitalink** I lead the antenna tracker: a 435 MHz cross-Yagi, a Fusion 360 chassis stiff enough to hold a beam on a moving satellite, motion firmware for hybrid servo drives, and adaptive control for a mount heavy enough to fight back.",
+      "At **IIT Ropar** I built a five-phase IPMSM drive from the transforms up — two current planes instead of one, five regulators instead of three, and a torque equation I had to derive before I could use it. Then I put the modulator on a TI C2000 DSP and tested the gate driver.",
+      "Electrical Engineering at **Zakir Husain College of Engineering and Technology, AMU**."
     ],
     "panel": [
-      { "label": "Studying",     "value": "B.Tech EE, AMU · 2027" },
-      { "label": "Current role", "value": "Lead Engineer, Orbitalink" },
-      { "label": "Research",     "value": "IIT Ropar · 2026" },
-      { "label": "Focus",        "value": "Motor drives, control, RF" },
-      { "label": "Based in",     "value": "Aligarh, India" }
+      {
+        "label": "Studying",
+        "value": "B.Tech EE, AMU · 2027"
+      },
+      {
+        "label": "Current role",
+        "value": "Lead Engineer, Orbitalink"
+      },
+      {
+        "label": "Research Intern",
+        "value": "IIT Ropar · 2026"
+      },
+      {
+        "label": "Focus",
+        "value": "Motor drives, control, RF, Cyber Security, Digital Twin"
+      },
+      {
+        "label": "Chairperson",
+        "value": "IEEESTB AMU"
+      }
     ]
   },
-
   "experience": {
     "intro": "Research, industry and a university satellite programme.",
     "items": [
@@ -44,8 +66,7 @@
         "when": "Jun 2026 – Jul 2026",
         "org": "Indian Institute of Technology Ropar · Rupnagar",
         "bullets": [
-          "Modelled a five-phase IPMSM in MATLAB/Simulink and designed dual-plane FOC with MTPA and flux weakening.",
-          "Derived loss-aware MTPA with Lagrange multipliers and a Newton–Raphson solver; implemented DTC and five-phase SVPWM.",
+          "Modelled a five-phase IPMSM in MATLAB/Simulink and designed dual-plane FOC.",
           "Generated ePWM on a TI C2000 DSP in Code Composer Studio and tested the gate driver circuit."
         ]
       },
@@ -77,36 +98,84 @@
       }
     ]
   },
-
   "skills": {
     "note": "",
     "groups": [
-      { "title": "Control and power", "items": ["FOC", "MTPA", "Flux weakening", "DTC", "SVPWM", "Adaptive PID", "DC-DC converters"] },
-      { "title": "Embedded",          "items": ["C / C++", "TI C2000", "STM32", "Arduino", "I2C", "Servo drives"] },
-      { "title": "RF and design",     "items": ["Yagi antennas", "MMANA-GAL", "GNU Radio", "Fusion 360", "FEA"] },
-      { "title": "Software",          "items": ["MATLAB", "Simulink", "Python", "scikit-learn", "JavaScript", "Node.js", "Git"] }
+      {
+        "title": "Control and power",
+        "items": [
+          "FOC",
+          "MTPA",
+          "PID",
+          "DC-DC converters"
+        ]
+      },
+      {
+        "title": "Embedded",
+        "items": [
+          "STM32",
+          "Arduino",
+          "I2C",
+          "Servo drives"
+        ]
+      },
+      {
+        "title": "RF and Antenna",
+        "items": [
+          "Yagi antennas",
+          "MMANA-GAL",
+          "GNU Radio"
+        ]
+      },
+      {
+        "title": "Software",
+        "items": [
+          "MATLAB",
+          "Simulink",
+          "Python",
+          "scikit-learn",
+          "Git"
+        ]
+      },
+      {
+        "title": "Mechanical Design",
+        "items": [
+          "Fusion 360"
+        ]
+      },
+      {
+        "title": "ECAD",
+        "items": [
+          "PCB Design using Altium"
+        ]
+      }
     ]
   },
-
   "resume": {
     "intro": "A one-page resume for applications, and a full CV with every detail.",
     "updated": "September 2026",
     "certs": [
-      { "title": "Electrical Engineering Job Simulation", "issuer": "GE Aerospace" },
-      { "title": "MATLAB Simulation and Control",         "issuer": "IEEE SB AMU · 2025" },
-      { "title": "Advanced Aircraft Design Workshop",     "issuer": "BSERC · 2024" },
-      { "title": "Certificate of Participation",          "issuer": "SS AMU SAT · 2024" }
+      {
+        "title": "Electrical Engineering Job Simulation",
+        "issuer": "GE Aerospace"
+      },
+      {
+        "title": "MATLAB Simulation and Control",
+        "issuer": "IEEE STB AMU · 2025"
+      },
+      {
+        "title": "Advanced Aircraft Design Workshop",
+        "issuer": "BSERC · 2024"
+      }
     ]
   },
-
   "contact": {
     "heading": "Let's build something together.",
-    "text": "Open to research collaborations, internships and engineering roles in motor drives, control and satellite systems.",
+    "text": "Open to research collaborations, internships and engineering roles in cybersecurity in Digital Twin, motor drives, control and ground station systems.",
     "email": "saqibali1729@gmail.com",
     "linkedin": "https://www.linkedin.com/in/saqib-a-2a3a01287",
     "github": "https://github.com/WhiteScholar-01"
   },
-
   "footer": {
     "location": "Aligarh, India"
   }
