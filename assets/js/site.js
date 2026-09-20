@@ -124,16 +124,69 @@ function applySite(site) {
   const c = site.contact || {};
   setText("#contactHeading", c.heading);
   setText("#contactText", c.text);
-  if (c.email || c.linkedin || c.github) {
-    $("#contactActions").innerHTML = [
-      c.email && `<a class="btn primary" href="mailto:${esc(c.email)}">Email me</a>`,
-      c.linkedin && `<a class="btn" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`,
-      c.github && `<a class="btn" href="${esc(c.github)}" target="_blank" rel="noopener">GitHub</a>`
-    ].filter(Boolean).join("");
-  }
+  renderContactCard(c);
 
   /* ---- footer ---- */
   setText("#footerLoc", site.footer?.location);
+}
+
+
+/* --------------------------------------------------------------------------
+   Contact card
+   --------------------------------------------------------------------------
+   The values are printed, not hidden behind a button. A mailto: link does
+   nothing at all on a machine with no mail client configured, so the address
+   has to be readable — and copyable in one click — on its own.
+   -------------------------------------------------------------------------- */
+const ICON = {
+  email: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
+  github: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>`,
+  linkedin: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95C20.5 8.75 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.38-2.06-3.38-2.06 0-2.38 1.6-2.38 3.27V21H9z"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>`
+};
+
+/** Show a handle rather than a whole URL: github.com/x -> x */
+const handle = (u, prefix = "") => {
+  try {
+    const parts = new URL(u).pathname.split("/").filter(Boolean);
+    return prefix + parts.slice(-1)[0];
+  } catch { return u; }
+};
+
+function renderContactCard(c) {
+  const box = $("#contactCard");
+  if (!box) return;
+  const cells = [
+    c.email && { k: "email", label: "Email", href: `mailto:${c.email}`, text: c.email, copy: c.email },
+    c.github && { k: "github", label: "GitHub", href: c.github, text: handle(c.github), ext: true },
+    c.linkedin && { k: "linkedin", label: "LinkedIn", href: c.linkedin, text: handle(c.linkedin, "in/"), ext: true },
+    c.phone && { k: "phone", label: "Phone", href: `tel:${String(c.phone).replace(/[^+\d]/g, "")}`, text: c.phone, copy: c.phone }
+  ].filter(Boolean);
+  if (!cells.length) return;
+
+  box.innerHTML = cells.map(cell => `
+    <div class="cc">
+      <span class="cc-label">${ICON[cell.k]}${esc(cell.label)}</span>
+      <a class="cc-value" href="${esc(cell.href)}"${cell.ext ? ' target="_blank" rel="noopener"' : ""}>${esc(cell.text)}</a>
+      ${cell.copy ? `<button class="cc-copy" type="button" data-copy="${esc(cell.copy)}" aria-label="Copy ${esc(cell.label).toLowerCase()}">Copy</button>` : ""}
+    </div>`).join("");
+
+  box.onclick = async e => {
+    const b = e.target.closest(".cc-copy");
+    if (!b) return;
+    try {
+      await navigator.clipboard.writeText(b.dataset.copy);
+    } catch {
+      // Clipboard API needs a secure context; fall back to selecting the text.
+      const r = document.createRange();
+      r.selectNodeContents(b.previousElementSibling);
+      getSelection().removeAllRanges();
+      getSelection().addRange(r);
+    }
+    b.textContent = "Copied";
+    b.classList.add("done");
+    setTimeout(() => { b.textContent = "Copy"; b.classList.remove("done"); }, 1600);
+  };
 }
 
 /* --------------------------------------------------------------------------

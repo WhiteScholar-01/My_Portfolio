@@ -277,10 +277,22 @@ setTimeout(function () {
       <span class="num">06 / CONTACT</span>
       <h2 id="contactHeading">Let's build something together.</h2>
       <p id="contactText">Open to research collaborations, internships and engineering roles in motor drives, control and satellite systems.</p>
-      <div class="actions" id="contactActions">
-        <a class="btn primary" href="mailto:saqibali1729@gmail.com">Email me</a>
-        <a class="btn" href="https://www.linkedin.com/in/saqib-a-2a3a01287" target="_blank" rel="noopener">LinkedIn</a>
-        <a class="btn" href="https://github.com/WhiteScholar-01" target="_blank" rel="noopener">GitHub</a>
+      <!-- Values are shown, not hidden behind a button: a mailto: link does
+           nothing on a machine with no mail client set up, so the address
+           itself has to be readable and copyable. -->
+      <div class="contact-card sheet" id="contactCard">
+        <div class="cc">
+          <span class="cc-label">Email</span>
+          <a class="cc-value" href="mailto:saqibali1729@gmail.com">saqibali1729@gmail.com</a>
+        </div>
+        <div class="cc">
+          <span class="cc-label">GitHub</span>
+          <a class="cc-value" href="https://github.com/WhiteScholar-01" target="_blank" rel="noopener">WhiteScholar-01</a>
+        </div>
+        <div class="cc">
+          <span class="cc-label">LinkedIn</span>
+          <a class="cc-value" href="https://www.linkedin.com/in/saqib-a-2a3a01287" target="_blank" rel="noopener">in/saqib-a-2a3a01287</a>
+        </div>
       </div>
     </div>
   </section>

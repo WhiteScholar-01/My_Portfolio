@@ -745,6 +745,72 @@ dialog[open] { animation: pop .25s var(--ease); }
 .contact p { color: var(--muted); max-width: 50ch; margin: 0 auto 30px; }
 .contact .actions { justify-content: center; }
 
+/* Contact card — values printed, not hidden behind buttons. */
+.contact-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 660px;
+  margin: 0 auto;
+  text-align: left;
+  overflow: hidden;
+}
+.cc {
+  position: relative;
+  padding: 18px 22px;
+  min-width: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.cc:nth-child(-n+2) { border-top: 0; }
+.cc:nth-child(odd)  { border-left: 0; }
+/* An odd last cell takes the full width so the grid never ends ragged. */
+.cc:nth-child(odd):last-child { grid-column: 1 / -1; border-left: 0; }
+
+.cc-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 .72rem/1 var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+.cc-label svg { width: 14px; height: 14px; flex: 0 0 auto; }
+
+.cc-value {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  font-size: .98rem;
+  overflow-wrap: anywhere;
+  padding-right: 54px;
+}
+.cc-value:hover { color: var(--accent-strong); text-decoration: underline; }
+
+.cc-copy {
+  position: absolute;
+  top: 15px; right: 14px;
+  font: 500 .7rem var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.cc-copy:hover { color: var(--accent-strong); border-color: var(--accent-line); }
+.cc-copy.done { color: var(--ok); border-color: var(--ok); }
+
+@media (max-width: 560px) {
+  .contact-card { grid-template-columns: 1fr; }
+  .cc { border-left: 0; border-top: 1px solid var(--line); }
+  .cc:first-child { border-top: 0; }
+}
+
 footer {
   border-top: 1px solid var(--line);
   padding: 24px 0;

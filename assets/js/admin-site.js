@@ -104,7 +104,8 @@ const SPEC = [
       { k: "text",     label: "Paragraph", type: "area" },
       { k: "email",    label: "Email", type: "text" },
       { k: "linkedin", label: "LinkedIn URL", type: "text" },
-      { k: "github",   label: "GitHub URL", type: "text" }
+      { k: "github",   label: "GitHub URL", type: "text" },
+      { k: "phone",    label: "Phone", type: "text", hint: "optional — adds a fourth card, leave empty to hide it" }
     ]
   },
   {
