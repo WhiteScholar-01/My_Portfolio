@@ -31,27 +31,89 @@
     "year": "2026",
     "category": "Motor drives",
     "org": "IIT Ropar",
+    "status": "Completed",
     "featured": true,
     "published": true,
-    "summary": "Modelling and control of a five-phase interior permanent magnet synchronous motor, from Simulink to TI DSP hardware at IIT Ropar.",
+    "summary": "Dual-plane field-oriented control of a five-phase IPMSM, taken from an open-loop machine model to a closed-loop drive with five PID loops and five-phase SVPWM, then to ePWM on TI C2000 hardware.",
     "details": [
-      "Dual-plane FOC with MTPA and voltage-limited flux weakening",
-      "Loss-aware MTPA derived with Lagrange multipliers, solved by Newton–Raphson",
-      "Direct torque control with 20-sector hysteresis switching and five-phase SVPWM",
-      "ePWM generation on a TI C2000 DSP and gate driver testing"
+      "Built a five-phase IPMSM model in Simulink with dual-plane Clarke/Park transforms, resolving the machine into a fundamental (d1-q1) and a third-harmonic (d3-q3) plane rather than the single plane a three-phase drive needs",
+      "Implemented torque production across both planes, including the reluctance term (Ld−Lq)·id·iq and the third-harmonic contribution, so injected third-harmonic current adds torque instead of only loss",
+      "Closed five control loops — one speed loop and four current loops — and tuned them with Simulink's Closed-Loop PID Autotuner against the plant model",
+      "Generated gate signals with five-phase space-vector PWM, driving a 10-switch two-level inverter at a 2 µs discrete step",
+      "Derived loss-aware MTPA with Lagrange multipliers and solved it numerically with Newton-Raphson, and implemented direct torque control with 20-sector hysteresis switching as a comparison scheme",
+      "Ported the modulator to a TI C2000 DSP in Code Composer Studio, generating ePWM and testing the gate driver circuit"
     ],
     "tags": [
       "MATLAB",
       "Simulink",
       "FOC",
       "MTPA",
-      "TI C2000"
+      "Mathematical Modeling"
     ],
-    "image": "",
-    "gallery": [],
+    "image": "projects/five-phase-ipmsm-foc/images/cover-mua35ntw.jpg",
+    "gallery": [
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img1-mua2xbxc.jpg",
+        "caption": "Wm_ref and wm Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img2-mua2xd0u.jpg",
+        "caption": "Id1 and Iq1 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img3-mua2xe87.jpg",
+        "caption": "Te Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img4-mua2xfg2.jpg",
+        "caption": "vd3 and Vq3 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img5-mua2xgvj.jpg",
+        "caption": "Vd1 and Vq3 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img6-mua2xibk.jpg",
+        "caption": "Id3 and Iq3 Vs Time"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "The problem",
+        "body": "A three-phase drive has one current plane and two degrees of freedom. A five-phase machine has two planes and four, and most of the extra freedom is usually thrown away — the third-harmonic plane is treated as a loss path to be suppressed rather than a place to make torque.\n\nFive-phase machines are used where a lost phase must not stop the machine, so the control has to be built around that structure from the start rather than bolted on afterwards. The question I wanted to answer was what it actually takes to control both planes at once, and whether the second plane earns its complexity."
+      },
+      {
+        "heading": "Approach",
+        "body": "I built the drive in two stages rather than one.\n\nThe first model excites the machine open-loop with sinusoidal voltages and verifies the transforms and the electrical model in isolation — no controller, no modulator, nothing that could mask a modelling error. It runs at a 10 µs step because nothing in it switches.\n\nOnly once that was trustworthy did I close the loops. The second model adds the inverter, the modulator and five PID loops, and drops to a 2 µs step so the switching instants land on the grid properly. Separating the two meant that when the closed-loop model misbehaved I already knew the plant underneath it was right."
+      },
+      {
+        "heading": "Key features",
+        "body": "- Dual-plane decomposition: fundamental (d1-q1) and third-harmonic (d3-q3) planes controlled independently\n- Five regulators: outer speed loop, four inner current loops\n- Loss-aware MTPA using Lagrange multipliers, solved by Newton-Raphson\n- Flux weakening limited by the available DC-link voltage\n- Five-phase SVPWM modulator driving a 10-switch two-level inverter\n- Direct torque control with 20-sector hysteresis switching, as a comparison\n- Load-torque step disturbance for testing transient response"
+      },
+      {
+        "heading": "Technologies",
+        "body": "MATLAB and Simulink, Simscape Electrical (Specialized Power Systems), Stateflow for the transform and modulator logic, Simulink Control Design for autotuning, and Code Composer Studio for the DSP target."
+      },
+      {
+        "heading": "Software components",
+        "body": "A five-phase coordinate transform block pair (forward and inverse) handling both planes. A torque computation implementing the dual-plane expression. Five discrete PID regulators. An MTPA solver. An SVPWM modulator plus a comparison modulation path. Stateflow charts carrying the abc-to-dq and dq-to-abc mappings."
+      },
+      {
+        "heading": "Technical detail",
+        "body": "The transform uses the standard 2/5 scaling with 72° phase separation, so the fundamental plane maps on cos/sin of θe and the third-harmonic plane on cos/sin of 3θe. Torque comes out as\n\nTe = (5P/4)·[ λm·iq1 + (Ld1−Lq1)·id1·iq1 + 3λm3·iq3 + (Ld3−Lq3)·id3·iq3 ]\n\nThe first two terms are the familiar magnet and reluctance torque; the second pair is the third-harmonic plane's contribution, which is why injecting third-harmonic current raises torque rather than just heating the machine.\n\nBecause Lq1 > Ld1, the reluctance term is only positive for negative id1, which is what sets the MTPA trajectory. Solving MTPA with a loss term rather than pure copper-loss minimisation has no closed form, hence the Newton-Raphson solver.\n\nThe closed-loop model runs fixed-step discrete at 2 µs. The switching period has to be an exact multiple of the step or the modulator jitters, which shows up as current ripple that looks like a tuning problem and isn't."
+      },
+      {
+        "heading": "My contribution",
+        "body": "I did the mathematical modelling and the simulation design. Professor Saifullah Payami and PhD scholar Amitesh Kumar provided a reference paper and a working three-phase reference model as the starting point.\n\nExtending that to five phases was mine. A three-phase machine has one current plane; a five-phase machine has two, so the transform is not a matter of adding two more columns. I derived the five-phase Clarke and Park transforms myself — the fundamental plane on 72° spacing and the third-harmonic plane on 3θe, both with the 2/5 scaling — along with the dual-plane torque expression and the structure of the five regulators that sit on top of it."
+      },
+      {
+        "heading": "Results",
+        "body": "The closed-loop drive was run against a 1500 rpm (157 rad/s) speed reference with a 10 N·m load torque applied as a step at t = 5 s.\n\nSpeed reaches the 157 rad/s reference in about 0.2 s, with roughly 3.8% overshoot (peak ≈163 rad/s) and no steady-state error.\nThe load step produces no visible speed deviation at plot scale — the speed loop rejects it faster than the trace resolves.\nElectromagnetic torque settles exactly on the 10 N·m load, after ≈32 N·m during acceleration.\nq-axis current tracks torque demand: 15 A accelerating, ≈0 A unloaded, 4.7 A holding 10 N·m. Both figures give the same 2.13 N·m/A, which confirms the torque expression and the transform agree with each other.\nd-axis current is held at zero throughout, and the third-harmonic plane currents stay within about ±0.9 A, so the second plane carries ripple only and no net current."
+      }
+    ],
+    "files": [],
     "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "demo_url": ""
   },
   {
     "slug": "two-axis-antenna-tracker",
