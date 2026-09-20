@@ -197,7 +197,14 @@
       "JavaScript"
     ],
     "image": "projects/weather-dashboard/images/cover-mu9dr39o.jpg",
-    "gallery": [],
+    "gallery": [
+      {
+        "src": "projects/weather-dashboard/images/Img1.png",
+        "caption": "Home Page of the website"
+      }
+    ],
+    "sections": [],
+    "files": [],
     "code_url": "https://github.com/WhiteScholar-01/Weather-webapp.git",
     "demo_url": "https://weather-webapp-whitescholar-01.onrender.com"
   }
