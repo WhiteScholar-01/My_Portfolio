@@ -1,5 +1,31 @@
 [
   {
+    "slug": "437-mhz-9-element-long-yagi",
+    "title": "437 MHz 9-element long-Yagi",
+    "year": "2026",
+    "category": "RF & antennas",
+    "org": "Orbitalink",
+    "status": "Completed",
+    "featured": false,
+    "published": true,
+    "summary": "Nine-element DL6WU long-Yagi for the 70 cm band, designed to feed 50 Ω directly with only a 1:1 balun, and documented as a full construction manual.",
+    "details": [
+      "Designed a 9-element Rothammel/DL6WU long-Yagi for 437 MHz: 1283 mm round-boom array of one reflector, a straight half-wave dipole and seven directors, calculated for 11.24 dBd (13.39 dBi) over 428–446 MHz",
+      "Sized the driven element from theory rather than by trial: a 343 mm half-wave scaled by a 0.959 thickness-correction factor to two 164.6 mm halves across a 3.4 mm feed gap",
+      "Eliminated the matching network by choosing a straight dipole over a folded one, putting the feedpoint near 50 Ω so only a 1:1 balun is needed instead of an impedance step-up",
+      "Carried the boom diameter through the calculation as a design variable (d/λ = 0.007, D/λ = 0.015), so element lengths and the 51→216 mm progressive director spacing stay valid for the 10 mm round boom actually used"
+    ],
+    "tags": [
+      "Yagi",
+      "Antenna design",
+      "DL6WU"
+    ],
+    "image": "projects/437-mhz-9-element-long-yagi/images/cover-mu9g0tw0.jpg",
+    "gallery": [],
+    "code_url": "",
+    "demo_url": ""
+  },
+  {
     "slug": "five-phase-ipmsm-foc",
     "title": "Five-phase IPMSM field-oriented control",
     "year": "2026",
@@ -123,42 +149,56 @@
   {
     "slug": "dc-dc-boost-converter",
     "title": "DC-DC boost converter",
-    "year": "",
+    "year": "2025",
     "category": "Power electronics",
-    "org": "",
+    "org": "Coursework, AMU",
+    "status": "Completed",
     "featured": false,
     "published": true,
     "summary": "Simulink model analysing steady-state and transient response across duty cycles and loads.",
-    "details": [],
-    "tags": [
-      "Simulink",
-      "SMPS"
+    "details": [
+      "Open-loop boost converter modelled in Simscape Electrical: 20 V input, 10 kHz switching at 50% duty, 3.5 mH inductor and 572 µF output capacitor into a 200 Ω load",
+      "Measured 39.2 V output against the ideal Vin/(1−D) = 40 V, tracing the shortfall to the 0.8 V diode drop and the MOSFET's 0.1 Ω on-resistance",
+      "Verified continuous conduction mode: critical inductance is 1.25 mH, so the 3.5 mH choke holds inductor ripple to 0.29 A peak-to-peak on a 0.39 A average",
+      "Instrumented inductor, switch, diode and capacitor currents alongside inductor, switch and load voltages, with a Mean block averaging output voltage over one switching period",
+      "Diagnosed a startup failure mode: a lightly damped L-C pair (Q ≈ 40) driven by a hard duty step produced a 15 A inductor peak and 74 V output overshoot, both well beyond the ratings a 40 V, 0.4 A design would use",
+      "Fixed it by pre-charging the output capacitor to Vin and ramping duty from 0 to 0.5 over 100 ms through a PWM Generator, cutting the peak to 0.9 A and 40.1 V — a 17× reduction in inrush current"
     ],
-    "image": "",
+    "tags": [
+      "MATLAB",
+      "Simulink",
+      "Simscape Electrical"
+    ],
+    "image": "projects/dc-dc-boost-converter/images/cover-mu9f4fwc.jpg",
     "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "code_url": "https://github.com/WhiteScholar-01/My_Portfolio/blob/main/projects/dc-dc-boost-converter/Model_Boost.slx",
+    "demo_url": ""
   },
   {
     "slug": "weather-dashboard",
     "title": "Weather dashboard",
-    "year": "",
+    "year": "2024",
     "category": "Web",
-    "org": "",
+    "org": "Self-directed",
+    "status": "Completed",
     "featured": false,
     "published": true,
     "summary": "Responsive app with live weather for any city and API error handling, deployed on Render.",
-    "details": [],
+    "details": [
+      "Server-rendered Node/Express app with a POST route that queries the OpenWeatherMap current-weather API for any city",
+      "Renders seven live readings per lookup: temperature, humidity, visibility, wind speed, cloudiness, sunrise and sunset",
+      "Bootstrap offcanvas navigation and a mobile-first layout that collapses to a single column on phones",
+      "Unknown or misspelled city names return to the search form instead of throwing, so a bad lookup never crashes the server",
+      "Deployed on Render with the API key held in an environment variable rather than committed to the repository"
+    ],
     "tags": [
       "Node.js",
       "Axios",
       "JavaScript"
     ],
-    "image": "",
+    "image": "projects/weather-dashboard/images/cover-mu9dr39o.jpg",
     "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "code_url": "https://github.com/WhiteScholar-01/Weather-webapp.git",
+    "demo_url": "https://weather-webapp-whitescholar-01.onrender.com"
   }
 ]
