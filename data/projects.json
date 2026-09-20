@@ -31,27 +31,89 @@
     "year": "2026",
     "category": "Motor drives",
     "org": "IIT Ropar",
+    "status": "Completed",
     "featured": true,
     "published": true,
-    "summary": "Modelling and control of a five-phase interior permanent magnet synchronous motor, from Simulink to TI DSP hardware at IIT Ropar.",
+    "summary": "Dual-plane field-oriented control of a five-phase IPMSM, taken from an open-loop machine model to a closed-loop drive with five PID loops and five-phase SVPWM, then to ePWM on TI C2000 hardware.",
     "details": [
-      "Dual-plane FOC with MTPA and voltage-limited flux weakening",
-      "Loss-aware MTPA derived with Lagrange multipliers, solved by Newton–Raphson",
-      "Direct torque control with 20-sector hysteresis switching and five-phase SVPWM",
-      "ePWM generation on a TI C2000 DSP and gate driver testing"
+      "Built a five-phase IPMSM model in Simulink with dual-plane Clarke/Park transforms, resolving the machine into a fundamental (d1-q1) and a third-harmonic (d3-q3) plane rather than the single plane a three-phase drive needs",
+      "Implemented torque production across both planes, including the reluctance term (Ld−Lq)·id·iq and the third-harmonic contribution, so injected third-harmonic current adds torque instead of only loss",
+      "Closed five control loops — one speed loop and four current loops — and tuned them with Simulink's Closed-Loop PID Autotuner against the plant model",
+      "Generated gate signals with five-phase space-vector PWM, driving a 10-switch two-level inverter at a 2 µs discrete step",
+      "Derived loss-aware MTPA with Lagrange multipliers and solved it numerically with Newton-Raphson, and implemented direct torque control with 20-sector hysteresis switching as a comparison scheme",
+      "Ported the modulator to a TI C2000 DSP in Code Composer Studio, generating ePWM and testing the gate driver circuit"
     ],
     "tags": [
       "MATLAB",
       "Simulink",
       "FOC",
       "MTPA",
-      "TI C2000"
+      "Mathematical Modeling"
     ],
-    "image": "",
-    "gallery": [],
+    "image": "projects/five-phase-ipmsm-foc/images/cover-mua35ntw.jpg",
+    "gallery": [
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img1-mua2xbxc.jpg",
+        "caption": "Wm_ref and wm Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img2-mua2xd0u.jpg",
+        "caption": "Id1 and Iq1 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img3-mua2xe87.jpg",
+        "caption": "Te Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img4-mua2xfg2.jpg",
+        "caption": "vd3 and Vq3 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img5-mua2xgvj.jpg",
+        "caption": "Vd1 and Vq3 Vs Time"
+      },
+      {
+        "src": "projects/five-phase-ipmsm-foc/images/img6-mua2xibk.jpg",
+        "caption": "Id3 and Iq3 Vs Time"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "The problem",
+        "body": "A three-phase drive has one current plane and two degrees of freedom. A five-phase machine has two planes and four, and most of the extra freedom is usually thrown away — the third-harmonic plane is treated as a loss path to be suppressed rather than a place to make torque.\n\nFive-phase machines are used where a lost phase must not stop the machine, so the control has to be built around that structure from the start rather than bolted on afterwards. The question I wanted to answer was what it actually takes to control both planes at once, and whether the second plane earns its complexity."
+      },
+      {
+        "heading": "Approach",
+        "body": "I built the drive in two stages rather than one.\n\nThe first model excites the machine open-loop with sinusoidal voltages and verifies the transforms and the electrical model in isolation — no controller, no modulator, nothing that could mask a modelling error. It runs at a 10 µs step because nothing in it switches.\n\nOnly once that was trustworthy did I close the loops. The second model adds the inverter, the modulator and five PID loops, and drops to a 2 µs step so the switching instants land on the grid properly. Separating the two meant that when the closed-loop model misbehaved I already knew the plant underneath it was right."
+      },
+      {
+        "heading": "Key features",
+        "body": "- Dual-plane decomposition: fundamental (d1-q1) and third-harmonic (d3-q3) planes controlled independently\n- Five regulators: outer speed loop, four inner current loops\n- Loss-aware MTPA using Lagrange multipliers, solved by Newton-Raphson\n- Flux weakening limited by the available DC-link voltage\n- Five-phase SVPWM modulator driving a 10-switch two-level inverter\n- Direct torque control with 20-sector hysteresis switching, as a comparison\n- Load-torque step disturbance for testing transient response"
+      },
+      {
+        "heading": "Technologies",
+        "body": "MATLAB and Simulink, Simscape Electrical (Specialized Power Systems), Stateflow for the transform and modulator logic, Simulink Control Design for autotuning, and Code Composer Studio for the DSP target."
+      },
+      {
+        "heading": "Software components",
+        "body": "A five-phase coordinate transform block pair (forward and inverse) handling both planes. A torque computation implementing the dual-plane expression. Five discrete PID regulators. An MTPA solver. An SVPWM modulator plus a comparison modulation path. Stateflow charts carrying the abc-to-dq and dq-to-abc mappings."
+      },
+      {
+        "heading": "Technical detail",
+        "body": "The transform uses the standard 2/5 scaling with 72° phase separation, so the fundamental plane maps on cos/sin of θe and the third-harmonic plane on cos/sin of 3θe. Torque comes out as\n\nTe = (5P/4)·[ λm·iq1 + (Ld1−Lq1)·id1·iq1 + 3λm3·iq3 + (Ld3−Lq3)·id3·iq3 ]\n\nThe first two terms are the familiar magnet and reluctance torque; the second pair is the third-harmonic plane's contribution, which is why injecting third-harmonic current raises torque rather than just heating the machine.\n\nBecause Lq1 > Ld1, the reluctance term is only positive for negative id1, which is what sets the MTPA trajectory. Solving MTPA with a loss term rather than pure copper-loss minimisation has no closed form, hence the Newton-Raphson solver.\n\nThe closed-loop model runs fixed-step discrete at 2 µs. The switching period has to be an exact multiple of the step or the modulator jitters, which shows up as current ripple that looks like a tuning problem and isn't."
+      },
+      {
+        "heading": "My contribution",
+        "body": "I did the mathematical modelling and the simulation design. Professor Saifullah Payami and PhD scholar Amitesh Kumar provided a reference paper and a working three-phase reference model as the starting point.\n\nExtending that to five phases was mine. A three-phase machine has one current plane; a five-phase machine has two, so the transform is not a matter of adding two more columns. I derived the five-phase Clarke and Park transforms myself — the fundamental plane on 72° spacing and the third-harmonic plane on 3θe, both with the 2/5 scaling — along with the dual-plane torque expression and the structure of the five regulators that sit on top of it."
+      },
+      {
+        "heading": "Results",
+        "body": "The closed-loop drive was run against a 1500 rpm (157 rad/s) speed reference with a 10 N·m load torque applied as a step at t = 5 s.\n\nSpeed reaches the 157 rad/s reference in about 0.2 s, with roughly 3.8% overshoot (peak ≈163 rad/s) and no steady-state error.\nThe load step produces no visible speed deviation at plot scale — the speed loop rejects it faster than the trace resolves.\nElectromagnetic torque settles exactly on the 10 N·m load, after ≈32 N·m during acceleration.\nq-axis current tracks torque demand: 15 A accelerating, ≈0 A unloaded, 4.7 A holding 10 N·m. Both figures give the same 2.13 N·m/A, which confirms the torque expression and the transform agree with each other.\nd-axis current is held at zero throughout, and the third-harmonic plane currents stay within about ±0.9 A, so the second plane carries ripple only and no net current."
+      }
+    ],
+    "files": [],
     "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "demo_url": ""
   },
   {
     "slug": "two-axis-antenna-tracker",
@@ -83,68 +145,94 @@
   {
     "slug": "cross-yagi-435mhz",
     "title": "435 MHz cross-Yagi antenna",
-    "year": "2025",
+    "year": "2026",
     "category": "RF & antennas",
     "org": "Orbitalink",
+    "status": "In progress",
     "featured": false,
     "published": true,
-    "summary": "Circularly polarised antenna for amateur satellites, modelled in MMANA-GAL before building.",
+    "summary": "Circularly polarised 14-element cross-Yagi for 435 MHz satellite work, phased mechanically by a quarter-wavelength boom offset and matched to 50 Ω with quarter-wave transformers.",
     "details": [
-      "Feedpoint tuned to 36.4 Ω",
-      "Two-stage phasing harness for circular polarisation",
-      "S-band variant modelled"
+      "Designed a 14-element cross-Yagi for 435 MHz — two orthogonal 7-element arrays (reflector, driven element, five directors) on a shared 1.14 m boom, modelled wire-by-wire in MMANA-GAL",
+      "Achieved circular polarisation by mechanical phasing: offsetting the vertical plane 172.3 mm (a free-space quarter wavelength) along the boom, so both driven elements are fed in phase with no delay line to build or tune",
+      "Solved the 50 Ω match with a quarter-wave transformer pair — two 36 Ω antennas paralleled directly give 18 Ω and 2.8:1 SWR, so each is fed through a quarter wavelength of 60 Ω line to present 100 Ω, and the two in parallel land on 50 Ω",
+      "Built the full 14-wire geometry in MMANA-GAL with two independent sources, and swept the pattern over real ground at 3 m to get realistic take-off angle and gain figures"
     ],
     "tags": [
       "MMANA-GAL",
       "NEC",
       "UHF"
     ],
-    "image": "",
-    "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "In progress"
-  },
-  {
-    "slug": "adaptive-pid-mount",
-    "title": "Adaptive PID for a high-inertia mount",
-    "year": "2025",
-    "category": "Control",
-    "org": "Orbitalink · AMU Innovation Foundation",
-    "featured": false,
-    "published": true,
-    "summary": "Adaptive controller that stabilises and precisely points a heavy antenna tracker, with AMU Innovation Foundation.",
-    "details": [],
-    "tags": [
-      "Adaptive control",
-      "System modelling"
+    "image": "projects/cross-yagi-435mhz/images/cover-mua3q1vg.jpg",
+    "gallery": [
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-1-mua3neht.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-2-mua3nfsq.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-3-mua3nh3k.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-4-mua3ni2n.jpg",
+        "caption": ""
+      }
     ],
-    "image": "",
-    "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
-  },
-  {
-    "slug": "sdr-image-downlink",
-    "title": "Image downlink over software-defined radio",
-    "year": "",
-    "category": "RF & antennas",
-    "org": "",
-    "featured": false,
-    "published": true,
-    "summary": "Wavelet-based image compression on a Raspberry Pi Compute Module 4, transmitted with GNU Radio.",
-    "details": [],
-    "tags": [
-      "CM4",
-      "Python",
-      "GNU Radio"
+    "sections": [
+      {
+        "heading": "The Problem",
+        "body": "Satellites tumble, and their antennas point wherever the spacecraft happens to be pointing. A linearly polarised ground antenna therefore suffers deep, unpredictable fades as the polarisation of the arriving signal rotates against it — losses that can exceed 20 dB at the worst alignment.\n\nCircular polarisation removes that failure mode: a circularly polarised antenna accepts either linear orientation at a constant 3 dB penalty rather than an occasional total null. The cost is that you now need two antennas, fed 90° out of phase, and something to combine them without wrecking the match."
+      },
+      {
+        "heading": "Approach",
+        "body": "Two orthogonal Yagis on one boom, with the phase quadrature produced by geometry rather than by electronics.\n\nInstead of building a phasing harness with an electrical quarter-wave delay line, I offset the entire vertical-plane array 172.3 mm along the boom — one free-space quarter wavelength at 435 MHz. The wavefront reaches the two driven elements a quarter cycle apart, so feeding both in phase produces circular polarisation. There is no delay line to cut, no velocity factor to get wrong, and nothing that drifts.\n\nThat decision moved the hard part into the matching network, which I solved separately with quarter-wave transformers."
+      },
+      {
+        "heading": "Key features",
+        "body": "- 14 elements: two orthogonal 7-element arrays on a shared 35 mm square boom\n- Mechanical phasing — 172.3 mm boom offset in place of an electrical delay line\n- Both driven elements fed at 0° phase, simplifying the harness to two equal cables\n- Quarter-wave 60 Ω transformers converting 36 Ω per antenna to 100 Ω, paralleling to 50 Ω\n- Element lengths tapering 319.3 mm (reflector) to 278.3 mm (last director)\n- Modelled over real ground at 3 m to give a usable take-off angle rather than a free-space figure"
+      },
+      {
+        "heading": "Technologies",
+        "body": "MMANA-GAL (NEC-2 method-of-moments), transmission-line theory for the matching network, and hand calculation for the phasing geometry."
+      },
+      {
+        "heading": "Hardware",
+        "body": "35 × 35 mm square aluminium boom, roughly 1.16–1.17 m of stock for a 1.14 m active length. Aluminium tube elements on insulated standoffs. Feed: two equal quarter-wave sections of 60 Ω coaxial line into a parallel junction, then 50 Ω coax to the SDR."
+      },
+      {
+        "heading": "Software components",
+        "body": "A 14-wire MMANA-GAL model with two independent sources (wire 2 for the horizontal plane, wire 9 for the vertical), 9 segments per element, auto-segmentation at DM1 200 / DM2 20, and a real-ground environment at 3 m height."
+      },
+      {
+        "heading": "Technical detail",
+        "body": "Phasing. At 435 MHz, λ = 689.1 mm, so a quarter wavelength in free space is 172.3 mm. Offsetting the vertical array by exactly that distance along the boom gives the 90° spatial phase difference circular polarisation requires. Every vertical-plane element therefore sits at its horizontal-plane counterpart's position plus 172.3 mm — reflector at 172.3 mm, driven at 351.8 mm, and so on to the last director at 1140 mm.\n\nMatching. Each array presents approximately 36 Ω resistive at resonance. Two of those in parallel give 18 Ω, which against 50 Ω coax is a 2.8:1 SWR — roughly 23% of forward power reflected. A quarter-wave transformer converts an impedance by Zin = Z0²/ZL, so choosing Z0 = √(36 × 100) = 60 Ω turns each 36 Ω feedpoint into 100 Ω. Two 100 Ω sources in parallel present 50 Ω, and the SWR collapses to near unity.\n\nThe transformer sections must be an ELECTRICAL quarter wavelength, so the physical length is 172.3 mm × the cable's velocity factor — about 114 mm for solid polyethylene at VF 0.66, or 141 mm for foam at 0.82. Cutting them to the free-space 172.3 mm is the single most common way to get this wrong, and it detunes the match completely."
+      },
+      {
+        "heading": "My contribution",
+        "body": "I did the antenna design: the element lengths and spacings, the decision to phase mechanically rather than electrically, the MMANA-GAL model and its sweeps, and the quarter-wave transformer matching network. Work carried out at Orbitalink for the satellite ground station."
+      },
+      {
+        "heading": "Testing",
+        "body": ""
+      },
+      {
+        "heading": "Results",
+        "body": "Modelled performance at 435 MHz over real ground at 3 m height: 16.67 dBi gain (this figure includes ground reflection gain; free-space gain is substantially lower), 13.19 dB front-to-back ratio, and a 3.2° take-off angle suited to low-elevation satellite passes.\n\nThe current model reports a driven-element impedance of 30.22 − j35.51 Ω. The reactive part shows the driven elements are still electrically short at 435 MHz, so the array is not yet resonant and the quarter-wave match — which assumes a resistive 36 Ω — cannot be applied until that is tuned out.\n\nNot yet built or measured. Next step is trimming to resonance, then a VNA sweep of the assembled array."
+      }
     ],
-    "image": "",
-    "gallery": [],
+    "files": [
+      {
+        "label": "cross yagi 435MHz mechanical phasing (3)",
+        "path": "projects/cross-yagi-435mhz/cross_yagi_435MHz_mechanical_phasing_3_.maa",
+        "note": "0.0 MB"
+      }
+    ],
     "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "demo_url": ""
   },
   {
     "slug": "dc-dc-boost-converter",
@@ -197,7 +285,14 @@
       "JavaScript"
     ],
     "image": "projects/weather-dashboard/images/cover-mu9dr39o.jpg",
-    "gallery": [],
+    "gallery": [
+      {
+        "src": "projects/weather-dashboard/images/Img1.png",
+        "caption": "Home Page of the website"
+      }
+    ],
+    "sections": [],
+    "files": [],
     "code_url": "https://github.com/WhiteScholar-01/Weather-webapp.git",
     "demo_url": "https://weather-webapp-whitescholar-01.onrender.com"
   }
