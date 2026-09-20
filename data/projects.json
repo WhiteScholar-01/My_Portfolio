@@ -143,22 +143,28 @@
   {
     "slug": "weather-dashboard",
     "title": "Weather dashboard",
-    "year": "",
+    "year": "2024",
     "category": "Web",
-    "org": "",
+    "org": "Self-directed",
+    "status": "Completed",
     "featured": false,
     "published": true,
     "summary": "Responsive app with live weather for any city and API error handling, deployed on Render.",
-    "details": [],
+    "details": [
+      "Server-rendered Node/Express app with a POST route that queries the OpenWeatherMap current-weather API for any city",
+      "Renders seven live readings per lookup: temperature, humidity, visibility, wind speed, cloudiness, sunrise and sunset",
+      "Bootstrap offcanvas navigation and a mobile-first layout that collapses to a single column on phones",
+      "Unknown or misspelled city names return to the search form instead of throwing, so a bad lookup never crashes the server",
+      "Deployed on Render with the API key held in an environment variable rather than committed to the repository"
+    ],
     "tags": [
       "Node.js",
       "Axios",
       "JavaScript"
     ],
-    "image": "",
+    "image": "projects/weather-dashboard/images/cover-mu9dr39o.jpg",
     "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "code_url": "https://github.com/WhiteScholar-01/Weather-webapp.git",
+    "demo_url": "https://weather-webapp-whitescholar-01.onrender.com"
   }
 ]
