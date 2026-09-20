@@ -145,48 +145,94 @@
   {
     "slug": "cross-yagi-435mhz",
     "title": "435 MHz cross-Yagi antenna",
-    "year": "2025",
+    "year": "2026",
     "category": "RF & antennas",
     "org": "Orbitalink",
+    "status": "In progress",
     "featured": false,
     "published": true,
-    "summary": "Circularly polarised antenna for amateur satellites, modelled in MMANA-GAL before building.",
+    "summary": "Circularly polarised 14-element cross-Yagi for 435 MHz satellite work, phased mechanically by a quarter-wavelength boom offset and matched to 50 Ω with quarter-wave transformers.",
     "details": [
-      "Feedpoint tuned to 36.4 Ω",
-      "Two-stage phasing harness for circular polarisation",
-      "S-band variant modelled"
+      "Designed a 14-element cross-Yagi for 435 MHz — two orthogonal 7-element arrays (reflector, driven element, five directors) on a shared 1.14 m boom, modelled wire-by-wire in MMANA-GAL",
+      "Achieved circular polarisation by mechanical phasing: offsetting the vertical plane 172.3 mm (a free-space quarter wavelength) along the boom, so both driven elements are fed in phase with no delay line to build or tune",
+      "Solved the 50 Ω match with a quarter-wave transformer pair — two 36 Ω antennas paralleled directly give 18 Ω and 2.8:1 SWR, so each is fed through a quarter wavelength of 60 Ω line to present 100 Ω, and the two in parallel land on 50 Ω",
+      "Built the full 14-wire geometry in MMANA-GAL with two independent sources, and swept the pattern over real ground at 3 m to get realistic take-off angle and gain figures"
     ],
     "tags": [
       "MMANA-GAL",
       "NEC",
       "UHF"
     ],
-    "image": "",
-    "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "In progress"
-  },
-  {
-    "slug": "sdr-image-downlink",
-    "title": "Image downlink over software-defined radio",
-    "year": "",
-    "category": "RF & antennas",
-    "org": "",
-    "featured": false,
-    "published": true,
-    "summary": "Wavelet-based image compression on a Raspberry Pi Compute Module 4, transmitted with GNU Radio.",
-    "details": [],
-    "tags": [
-      "CM4",
-      "Python",
-      "GNU Radio"
+    "image": "projects/cross-yagi-435mhz/images/cover-mua3q1vg.jpg",
+    "gallery": [
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-1-mua3neht.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-2-mua3nfsq.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-3-mua3nh3k.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/cross-yagi-435mhz/images/img-4-mua3ni2n.jpg",
+        "caption": ""
+      }
     ],
-    "image": "",
-    "gallery": [],
+    "sections": [
+      {
+        "heading": "The Problem",
+        "body": "Satellites tumble, and their antennas point wherever the spacecraft happens to be pointing. A linearly polarised ground antenna therefore suffers deep, unpredictable fades as the polarisation of the arriving signal rotates against it — losses that can exceed 20 dB at the worst alignment.\n\nCircular polarisation removes that failure mode: a circularly polarised antenna accepts either linear orientation at a constant 3 dB penalty rather than an occasional total null. The cost is that you now need two antennas, fed 90° out of phase, and something to combine them without wrecking the match."
+      },
+      {
+        "heading": "Approach",
+        "body": "Two orthogonal Yagis on one boom, with the phase quadrature produced by geometry rather than by electronics.\n\nInstead of building a phasing harness with an electrical quarter-wave delay line, I offset the entire vertical-plane array 172.3 mm along the boom — one free-space quarter wavelength at 435 MHz. The wavefront reaches the two driven elements a quarter cycle apart, so feeding both in phase produces circular polarisation. There is no delay line to cut, no velocity factor to get wrong, and nothing that drifts.\n\nThat decision moved the hard part into the matching network, which I solved separately with quarter-wave transformers."
+      },
+      {
+        "heading": "Key features",
+        "body": "- 14 elements: two orthogonal 7-element arrays on a shared 35 mm square boom\n- Mechanical phasing — 172.3 mm boom offset in place of an electrical delay line\n- Both driven elements fed at 0° phase, simplifying the harness to two equal cables\n- Quarter-wave 60 Ω transformers converting 36 Ω per antenna to 100 Ω, paralleling to 50 Ω\n- Element lengths tapering 319.3 mm (reflector) to 278.3 mm (last director)\n- Modelled over real ground at 3 m to give a usable take-off angle rather than a free-space figure"
+      },
+      {
+        "heading": "Technologies",
+        "body": "MMANA-GAL (NEC-2 method-of-moments), transmission-line theory for the matching network, and hand calculation for the phasing geometry."
+      },
+      {
+        "heading": "Hardware",
+        "body": "35 × 35 mm square aluminium boom, roughly 1.16–1.17 m of stock for a 1.14 m active length. Aluminium tube elements on insulated standoffs. Feed: two equal quarter-wave sections of 60 Ω coaxial line into a parallel junction, then 50 Ω coax to the SDR."
+      },
+      {
+        "heading": "Software components",
+        "body": "A 14-wire MMANA-GAL model with two independent sources (wire 2 for the horizontal plane, wire 9 for the vertical), 9 segments per element, auto-segmentation at DM1 200 / DM2 20, and a real-ground environment at 3 m height."
+      },
+      {
+        "heading": "Technical detail",
+        "body": "Phasing. At 435 MHz, λ = 689.1 mm, so a quarter wavelength in free space is 172.3 mm. Offsetting the vertical array by exactly that distance along the boom gives the 90° spatial phase difference circular polarisation requires. Every vertical-plane element therefore sits at its horizontal-plane counterpart's position plus 172.3 mm — reflector at 172.3 mm, driven at 351.8 mm, and so on to the last director at 1140 mm.\n\nMatching. Each array presents approximately 36 Ω resistive at resonance. Two of those in parallel give 18 Ω, which against 50 Ω coax is a 2.8:1 SWR — roughly 23% of forward power reflected. A quarter-wave transformer converts an impedance by Zin = Z0²/ZL, so choosing Z0 = √(36 × 100) = 60 Ω turns each 36 Ω feedpoint into 100 Ω. Two 100 Ω sources in parallel present 50 Ω, and the SWR collapses to near unity.\n\nThe transformer sections must be an ELECTRICAL quarter wavelength, so the physical length is 172.3 mm × the cable's velocity factor — about 114 mm for solid polyethylene at VF 0.66, or 141 mm for foam at 0.82. Cutting them to the free-space 172.3 mm is the single most common way to get this wrong, and it detunes the match completely."
+      },
+      {
+        "heading": "My contribution",
+        "body": "I did the antenna design: the element lengths and spacings, the decision to phase mechanically rather than electrically, the MMANA-GAL model and its sweeps, and the quarter-wave transformer matching network. Work carried out at Orbitalink for the satellite ground station."
+      },
+      {
+        "heading": "Testing",
+        "body": ""
+      },
+      {
+        "heading": "Results",
+        "body": "Modelled performance at 435 MHz over real ground at 3 m height: 16.67 dBi gain (this figure includes ground reflection gain; free-space gain is substantially lower), 13.19 dB front-to-back ratio, and a 3.2° take-off angle suited to low-elevation satellite passes.\n\nThe current model reports a driven-element impedance of 30.22 − j35.51 Ω. The reactive part shows the driven elements are still electrically short at 435 MHz, so the array is not yet resonant and the quarter-wave match — which assumes a resistive 36 Ω — cannot be applied until that is tuned out.\n\nNot yet built or measured. Next step is trimming to resonance, then a VNA sweep of the assembled array."
+      }
+    ],
+    "files": [
+      {
+        "label": "cross yagi 435MHz mechanical phasing (3)",
+        "path": "projects/cross-yagi-435mhz/cross_yagi_435MHz_mechanical_phasing_3_.maa",
+        "note": "0.0 MB"
+      }
+    ],
     "code_url": "",
-    "demo_url": "",
-    "status": "Completed"
+    "demo_url": ""
   },
   {
     "slug": "dc-dc-boost-converter",
