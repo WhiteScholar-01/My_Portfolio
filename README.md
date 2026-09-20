@@ -28,14 +28,17 @@ My_Portfolio/
 │   │   ├── hero.js         the animated satellite-pass canvas
 │   │   ├── site.js         home page behaviour
 │   │   ├── project-page.js fills in a project page
-│   │   └── admin.js        the project manager
+│   │   ├── admin.js        the project manager
+│   │   └── admin-site.js   the Site content tab
 │   ├── docs/
 │   │   ├── Saqib_Ali_Resume.pdf
 │   │   └── Saqib_Ali_CV.pdf
-│   ├── img/                site-wide images
+│   ├── img/
+│   │   └── og-image.png    social preview card (1200x630)
 │   └── templates/          used by admin.html to create new project folders
 │
 ├── data/
+│   ├── site.json           ← the home page, minus the projects
 │   └── projects.json       ← the single source of truth for all projects
 │
 └── projects/
@@ -57,9 +60,39 @@ in `data/projects.json`, never inside a page.
 
 ---
 
-## The two things that drive everything
+## The three things that drive everything
 
-### 1. `data/projects.json`
+### 1. `data/site.json`
+
+Everything on the home page except the projects: the hero, the proof numbers,
+About, Experience, Skills, the resume block, Contact and the footer. Edit it in
+`admin.html` under the **Site content** tab, or by hand.
+
+```json
+{
+  "hero":       { "eyebrow": "", "name": "…", "roles": ["…"], "lede": "…" },
+  "stats":      [ { "value": "8", "label": "Projects" } ],
+  "about":      { "heading": "…", "paragraphs": ["…"], "panel": [ { "label": "…", "value": "…" } ] },
+  "experience": { "intro": "…", "items": [ { "role": "…", "when": "…", "org": "…", "bullets": ["…"] } ] },
+  "skills":     { "note": "", "groups": [ { "title": "…", "items": ["…"] } ] },
+  "resume":     { "intro": "…", "updated": "September 2026", "certs": [ { "title": "…", "issuer": "…" } ] },
+  "contact":    { "heading": "…", "text": "…", "email": "…", "linkedin": "…", "github": "…" },
+  "footer":     { "location": "…" }
+}
+```
+
+Two things worth knowing:
+
+- **An empty `hero.eyebrow` means no eyebrow.** The small line above your name
+  is hidden unless you put something in it.
+- **About paragraphs accept `**bold**` and nothing else.** Everything is escaped
+  first, so text from this file can never inject markup into the page.
+
+If `data/site.json` is missing or unreadable the page falls back to the markup
+written into `index.html`, so nothing breaks. That fallback is also what a
+visitor with JavaScript turned off sees.
+
+### 2. `data/projects.json`
 
 One object per project. The home page builds its cards from this, and each
 project page reads its own entry from it.
@@ -108,7 +141,7 @@ Three more fields are optional — leave them out and nothing breaks:
 
 All three have editors in `admin.html`; you rarely need to write them by hand.
 
-### 2. `assets/css/tokens.css`
+### 3. `assets/css/tokens.css`
 
 Every colour in both themes. Change `--accent` there and the whole site — cards,
 buttons, the timeline, the animated hero — follows, because nothing else in the
@@ -167,6 +200,13 @@ your next `git push` will collide with work you made through the admin page.
 2. In `admin.html`, open that project and press **Scan folder** — it lists what
    is actually in the folder on GitHub and adds anything not already shown.
 3. Caption them, update the project, publish.
+
+### Change the hero, About or Experience
+
+Open `admin.html`, connect, then switch to the **Site content** tab. Every field
+on the home page is there, with repeatable rows for the proof numbers, the spec
+panel, your roles, the skill groups and the certificates. Press **Save site
+content**, then run `git pull` locally.
 
 ### Change a colour
 

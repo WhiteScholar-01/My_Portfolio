@@ -17,8 +17,9 @@
    A browser cannot write to your disk, so there is no way around that.
    ========================================================================== */
 
-import { $, esc, slugify } from "./util.js";
+import { $, $$, esc, slugify } from "./util.js";
 import { initTheme } from "./theme.js";
+import { createSiteEditor } from "./admin-site.js";
 
 const KEY  = "portfolio-admin";
 const DATA = "data/projects.json";
@@ -83,6 +84,13 @@ const put = (path, content, message, fileSha) =>
     body: JSON.stringify({ message, content, branch: cfg.branch, ...(fileSha ? { sha: fileSha } : {}) })
   });
 
+/* The Site content tab lives in its own module; it borrows this file's
+   GitHub plumbing rather than opening a second connection. */
+const siteEditor = createSiteEditor({
+  gh, put, toB64, fromB64,
+  ref: () => encodeURIComponent(cfg.branch)
+});
+
 /* --------------------------------------------------------------------------
    Load
    -------------------------------------------------------------------------- */
@@ -116,9 +124,12 @@ async function connectAndLoad() {
     await loadFromGitHub();
     $("#connectCard").hidden = true;
     $("#app").hidden = false;
+    $("#tabs").hidden = false;
     $("#signout").hidden = false;
     renderList();
     dirtyCheck();
+    await siteEditor.load();
+    siteEditor.mount();
   } catch (err) {
     say($("#connectMsg"), err.message);
     localStorage.removeItem(KEY);
@@ -656,7 +667,17 @@ $("#copyPull").onclick = async () => {
 };
 
 addEventListener("beforeunload", e => {
-  if (isDirty()) { e.preventDefault(); e.returnValue = ""; }
+  if (isDirty() || siteEditor.isDirty()) { e.preventDefault(); e.returnValue = ""; }
+});
+
+/* ---- tab switching: Projects | Site content ---- */
+$$(".tab").forEach(btn => btn.onclick = () => {
+  const target = btn.dataset.tab;
+  $$(".tab").forEach(b => b.setAttribute("aria-selected", String(b === btn)));
+  $$(".tabpanel").forEach(p => p.hidden = p.id !== `tab-${target}`);
+  // Only one save bar should be visible at a time.
+  $("#savebar").classList.toggle("muted-bar", target !== "projects");
+  $("#siteBar").classList.toggle("muted-bar", target !== "site");
 });
 
 /* --------------------------------------------------------------------------

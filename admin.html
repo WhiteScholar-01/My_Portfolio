@@ -41,6 +41,11 @@
     </div>
   </header>
 
+  <div class="tabs" role="tablist" id="tabs" hidden>
+    <button class="tab" type="button" role="tab" data-tab="projects" aria-selected="true">Projects</button>
+    <button class="tab" type="button" role="tab" data-tab="site" aria-selected="false">Site content</button>
+  </div>
+
   <!-- ===================== CONNECT ===================== -->
   <div class="card" id="connectCard">
     <h2>Connect to GitHub</h2>
@@ -59,6 +64,7 @@
   </div>
 
   <div id="app" hidden>
+  <div class="tabpanel" id="tab-projects" role="tabpanel">
     <!-- ===================== FORM ===================== -->
     <div class="card">
       <h2 id="formTitle">Add a project</h2>
@@ -159,6 +165,16 @@
         <code>README.md</code> for any project that doesn't have them yet.
       </p>
     </div>
+  </div><!-- /tab-projects -->
+
+  <!-- ===================== SITE CONTENT ===================== -->
+  <div class="tabpanel" id="tab-site" role="tabpanel" hidden>
+    <p class="hint" style="margin:0 0 18px">
+      Everything on the home page except the projects. Saved to
+      <code>data/site.json</code>.
+    </p>
+    <div id="siteEditor"></div>
+  </div><!-- /tab-site -->
   </div>
 </div>
 
@@ -175,6 +191,16 @@
     <span>Your computer doesn't have these changes yet — run
       <code>git pull</code> in your local folder.</span>
     <button class="btn small" type="button" id="copyPull">Copy</button>
+  </div>
+</div>
+
+<div class="savebar on muted-bar" id="siteBar">
+  <div class="inner">
+    <span id="siteMsg" class="msg">Unsaved changes to the site content.</span>
+    <div class="row">
+      <button class="btn small" type="button" id="siteRevertBtn">Discard</button>
+      <button class="btn primary" type="button" id="siteSaveBtn">Save site content</button>
+    </div>
   </div>
 </div>
 

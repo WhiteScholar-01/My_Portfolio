@@ -160,6 +160,57 @@ input[type="file"] { padding: 8px; font-size: .85rem; }
 }
 
 /* ==========================================================================
+   Tabs: Projects | Site content
+   ========================================================================== */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 22px;
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  font: 500 .92rem var(--font-sans);
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+/* A labelled field in the site-content form. */
+.ed-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.ed-field > span {
+  font: 500 .78rem var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ed-field > span .hint { text-transform: none; letter-spacing: 0; font-style: normal; }
+.ed-field textarea { min-height: 84px; }
+
+.ed-idx {
+  font: 500 .74rem var(--font-mono);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 1px 9px;
+}
+.ed-row.col .ed-top { justify-content: space-between; }
+
+/* Only the active tab's save bar is shown. */
+.muted-bar { display: none !important; }
+
+/* ==========================================================================
    Repeatable editors: sections, gallery, downloads
    ========================================================================== */
 .editor {

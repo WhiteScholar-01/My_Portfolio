@@ -14,6 +14,30 @@
 <meta property="og:title" content="Saqib Ali — Electrical Engineer">
 <meta property="og:description" content="Motor drive control, satellite antenna tracking and embedded firmware.">
 <meta property="og:url" content="https://whitescholar-01.github.io/My_Portfolio/">
+<meta property="og:image" content="https://whitescholar-01.github.io/My_Portfolio/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://whitescholar-01.github.io/My_Portfolio/assets/img/og-image.png">
+
+<!-- Structured data: lets search engines read this as a person, not just a page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Saqib Ali",
+  "jobTitle": "Electrical Engineering Student",
+  "url": "https://whitescholar-01.github.io/My_Portfolio/",
+  "email": "mailto:saqibali1729@gmail.com",
+  "address": { "@type": "PostalAddress", "addressLocality": "Aligarh", "addressCountry": "IN" },
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "Aligarh Muslim University" },
+  "sameAs": [
+    "https://github.com/WhiteScholar-01",
+    "https://www.linkedin.com/in/saqib-a-2a3a01287"
+  ],
+  "knowsAbout": ["Field-oriented control", "Power electronics", "Antenna design", "Embedded systems"]
+}
+</script>
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230A1420'/><g stroke='%23E7A15A' stroke-width='2' fill='none' stroke-linecap='round'><path d='M9 25h14M16 25V11'/><path d='M10 11h12M12 7h8'/></g></svg>">
 
@@ -80,22 +104,28 @@ setTimeout(function () {
   </div>
 </header>
 
+<!-- ==========================================================================
+     Everything below with an id is filled from data/site.json by site.js.
+     The markup here is the fallback shown if that file is missing or fails
+     to load, so the page always says something sensible.
+     ========================================================================== -->
 <main id="top">
   <!-- ===================== HERO ===================== -->
   <section class="hero">
     <canvas id="sky" aria-hidden="true"></canvas>
     <div class="wrap">
-      <p class="eyebrow">Aligarh, India</p>
-      <h1 data-split>Saqib Ali</h1>
+      <p class="eyebrow" id="heroEyebrow" hidden></p>
+      <h1 data-split id="heroName">Saqib Ali</h1>
       <p class="role"><b id="roleText">Electrical engineer</b><span class="caret" aria-hidden="true"></span></p>
-      <p class="lede">I lead antenna tracking system development at Orbitalink and research control for five-phase motor drives. Electrical Engineering at Aligarh Muslim University.</p>
+      <p class="lede" id="heroLede">I lead antenna tracking system development at Orbitalink and research control for five-phase motor drives. Electrical Engineering at Aligarh Muslim University.</p>
       <div class="actions">
-        <a class="btn primary" href="#projects">View projects</a>
-        <a class="btn" href="assets/docs/Saqib_Ali_Resume.pdf" download="Saqib_Ali_Resume.pdf">
+        <a class="btn primary" id="heroCta" href="#projects">View projects</a>
+        <a class="btn" id="heroResume" href="assets/docs/Saqib_Ali_Resume.pdf" download="Saqib_Ali_Resume.pdf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>
-          Download resume
+          <span id="heroResumeLabel">Download resume</span>
         </a>
       </div>
+      <dl class="stats" id="heroStats" hidden></dl>
     </div>
     <a class="scroll-hint" href="#about">Scroll</a>
   </section>
@@ -106,14 +136,16 @@ setTimeout(function () {
       <div class="reveal">
         <div class="sec-head">
           <span class="num">01 / ABOUT</span>
-          <h2>Where control, power and RF meet</h2>
+          <h2 id="aboutHeading">Where control, power and RF meet</h2>
         </div>
-        <p>I'm an Electrical Engineering student at <strong>Zakir Husain College of Engineering and Technology, AMU</strong>, working where control systems, power electronics and RF meet.</p>
-        <p>At <strong>Orbitalink</strong> I lead antenna tracking systems end to end: a 435 MHz cross-Yagi antenna, a Fusion 360 chassis, motion firmware for hybrid servo drives, and adaptive control for a high-inertia mount.</p>
-        <p>At <strong>IIT Ropar</strong> I modelled a five-phase IPMSM, designed field-oriented control with loss-aware MTPA, and generated ePWM on a TI DSP to test the gate driver.</p>
+        <div id="aboutBody">
+          <p>I'm an Electrical Engineering student at <strong>Zakir Husain College of Engineering and Technology, AMU</strong>, working where control systems, power electronics and RF meet.</p>
+          <p>At <strong>Orbitalink</strong> I lead antenna tracking systems end to end: a 435 MHz cross-Yagi antenna, a Fusion 360 chassis, motion firmware for hybrid servo drives, and adaptive control for a high-inertia mount.</p>
+          <p>At <strong>IIT Ropar</strong> I modelled a five-phase IPMSM, designed field-oriented control with loss-aware MTPA, and generated ePWM on a TI DSP to test the gate driver.</p>
+        </div>
       </div>
       <div class="panel sheet ticked reveal">
-        <dl>
+        <dl id="aboutPanel">
           <div><dt>Studying</dt><dd>B.Tech EE, AMU · 2027</dd></div>
           <div><dt>Current role</dt><dd>Lead Engineer, Orbitalink</dd></div>
           <div><dt>Research</dt><dd>IIT Ropar · 2026</dd></div>
@@ -130,7 +162,7 @@ setTimeout(function () {
       <div class="sec-head reveal">
         <span class="num">02 / EXPERIENCE</span>
         <h2>Experience</h2>
-        <p>Research, industry and a university satellite programme.</p>
+        <p id="expIntro">Research, industry and a university satellite programme.</p>
       </div>
       <ol class="timeline" id="timeline">
         <li class="reveal"><div class="job sheet ticked">
@@ -188,8 +220,9 @@ setTimeout(function () {
       <div class="sec-head reveal">
         <span class="num">04 / SKILLS</span>
         <h2>Skills</h2>
+        <p id="skillsNote" hidden></p>
       </div>
-      <div class="skills">
+      <div class="skills" id="skillsGrid">
         <div class="skill sheet reveal"><h3>Control and power</h3><ul><li>FOC</li><li>MTPA</li><li>Flux weakening</li><li>DTC</li><li>SVPWM</li><li>Adaptive PID</li><li>DC-DC converters</li></ul></div>
         <div class="skill sheet reveal"><h3>Embedded</h3><ul><li>C / C++</li><li>TI C2000</li><li>STM32</li><li>Arduino</li><li>I2C</li><li>Servo drives</li></ul></div>
         <div class="skill sheet reveal"><h3>RF and design</h3><ul><li>Yagi antennas</li><li>MMANA-GAL</li><li>GNU Radio</li><li>Fusion 360</li><li>FEA</li></ul></div>
@@ -205,7 +238,7 @@ setTimeout(function () {
         <div class="sec-head">
           <span class="num">05 / DOCUMENTS</span>
           <h2>Resume and CV</h2>
-          <p>A one-page resume for applications, and a full CV with every detail.</p>
+          <p id="resumeIntro">A one-page resume for applications, and a full CV with every detail.</p>
         </div>
         <div class="doc sheet">
           <div><h3>Resume</h3><span class="muted">1 page · PDF</span></div>
@@ -221,7 +254,8 @@ setTimeout(function () {
             <a class="btn small primary" href="assets/docs/Saqib_Ali_CV.pdf" download="Saqib_Ali_CV.pdf">Download</a>
           </div>
         </div>
-        <ul class="certs">
+        <p class="updated" id="resumeUpdated" hidden></p>
+        <ul class="certs" id="certs">
           <li>Electrical Engineering Job Simulation<span>GE Aerospace</span></li>
           <li>MATLAB Simulation and Control<span>IEEE SB AMU · 2025</span></li>
           <li>Advanced Aircraft Design Workshop<span>BSERC · 2024</span></li>
@@ -241,9 +275,9 @@ setTimeout(function () {
   <section class="block contact" id="contact">
     <div class="wrap reveal">
       <span class="num">06 / CONTACT</span>
-      <h2>Let's build something together.</h2>
-      <p>Open to research collaborations, internships and engineering roles in motor drives, control and satellite systems.</p>
-      <div class="actions">
+      <h2 id="contactHeading">Let's build something together.</h2>
+      <p id="contactText">Open to research collaborations, internships and engineering roles in motor drives, control and satellite systems.</p>
+      <div class="actions" id="contactActions">
         <a class="btn primary" href="mailto:saqibali1729@gmail.com">Email me</a>
         <a class="btn" href="https://www.linkedin.com/in/saqib-a-2a3a01287" target="_blank" rel="noopener">LinkedIn</a>
         <a class="btn" href="https://github.com/WhiteScholar-01" target="_blank" rel="noopener">GitHub</a>
@@ -255,7 +289,7 @@ setTimeout(function () {
 <footer>
   <div class="wrap">
     <span>© <span id="yr">2026</span> Saqib Ali</span>
-    <span>Aligarh, India</span>
+    <span id="footerLoc">Aligarh, India</span>
   </div>
 </footer>
 

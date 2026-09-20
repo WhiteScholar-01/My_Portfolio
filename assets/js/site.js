@@ -1,19 +1,145 @@
 /* ==========================================================================
    site.js — home page behaviour
-   Sections: A intro  B roles  C scroll chrome  D reveals  E projects  F misc
+   --------------------------------------------------------------------------
+   Order matters here. The page content comes from data/site.json and has to
+   be written into the DOM BEFORE the intro animation splits the headline and
+   before the scroll chrome measures the timeline — otherwise those two would
+   work on markup that is about to be replaced.
+
+   If data/site.json is missing or unreadable, nothing is replaced and the
+   fallback markup already in index.html stands. The site never goes blank.
    ========================================================================== */
 
 import { $, $$, esc, url, loadProjects, STATUS_ORDER, PLACEHOLDER } from "./util.js";
 import { initTheme } from "./theme.js";
 import { initHero } from "./hero.js";
 
-/* Tell the CSS that JS is alive, and cancel the no-JS safety net. */
 window.__jsReady = true;
+
+/* --------------------------------------------------------------------------
+   0. Page content from data/site.json
+   -------------------------------------------------------------------------- */
+async function loadSite() {
+  try {
+    const res = await fetch(`data/site.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } catch (err) {
+    console.warn("data/site.json not loaded — using the markup in index.html.", err);
+    return null;
+  }
+}
+
+/** Escape, then allow **bold** only. Keeps author text safe but expressive. */
+const bold = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+const setText = (sel, value) => {
+  const el = $(sel);
+  if (el && value != null && value !== "") el.textContent = value;
+};
+
+function applySite(site) {
+  if (!site) return;
+
+  /* ---- hero ---- */
+  const h = site.hero || {};
+  if (h.name) $("#heroName").textContent = h.name;
+  if (h.lede) $("#heroLede").textContent = h.lede;
+  setText("#heroResumeLabel", h.resumeLabel);
+  if (h.ctaLabel) $("#heroCta").textContent = h.ctaLabel;
+  if (h.ctaHref) $("#heroCta").setAttribute("href", h.ctaHref);
+
+  const eyebrow = $("#heroEyebrow");
+  if (eyebrow) {
+    // Empty string means "no eyebrow" — that is the default.
+    if (h.eyebrow) { eyebrow.textContent = h.eyebrow; eyebrow.hidden = false; }
+    else { eyebrow.hidden = true; }
+  }
+
+  /* ---- proof numbers ---- */
+  const stats = $("#heroStats");
+  if (stats && Array.isArray(site.stats) && site.stats.length) {
+    stats.innerHTML = site.stats
+      .filter(s => s && (s.value || s.label))
+      .map(s => `<div><dt>${esc(s.value)}</dt><dd>${esc(s.label)}</dd></div>`)
+      .join("");
+    stats.hidden = false;
+  }
+
+  /* ---- about ---- */
+  const a = site.about || {};
+  setText("#aboutHeading", a.heading);
+  if (Array.isArray(a.paragraphs) && a.paragraphs.length) {
+    $("#aboutBody").innerHTML = a.paragraphs
+      .filter(Boolean).map(p => `<p>${bold(p)}</p>`).join("");
+  }
+  if (Array.isArray(a.panel) && a.panel.length) {
+    $("#aboutPanel").innerHTML = a.panel
+      .filter(r => r && (r.label || r.value))
+      .map(r => `<div><dt>${esc(r.label)}</dt><dd>${esc(r.value)}</dd></div>`)
+      .join("");
+  }
+
+  /* ---- experience ---- */
+  const x = site.experience || {};
+  setText("#expIntro", x.intro);
+  if (Array.isArray(x.items) && x.items.length) {
+    $("#timeline").innerHTML = x.items.filter(Boolean).map(j => `
+      <li class="reveal"><div class="job sheet ticked">
+        <div class="job-top"><h3>${esc(j.role)}</h3><span class="when">${esc(j.when || "")}</span></div>
+        ${j.org ? `<p class="org">${esc(j.org)}</p>` : ""}
+        ${(j.bullets || []).length
+          ? `<ul>${j.bullets.filter(Boolean).map(b => `<li>${esc(b)}</li>`).join("")}</ul>`
+          : ""}
+      </div></li>`).join("");
+  }
+
+  /* ---- skills ---- */
+  const sk = site.skills || {};
+  if (sk.note) { const n = $("#skillsNote"); n.textContent = sk.note; n.hidden = false; }
+  if (Array.isArray(sk.groups) && sk.groups.length) {
+    $("#skillsGrid").innerHTML = sk.groups.filter(Boolean).map(g => `
+      <div class="skill sheet reveal">
+        <h3>${esc(g.title)}</h3>
+        <ul>${(g.items || []).filter(Boolean).map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+      </div>`).join("");
+  }
+
+  /* ---- resume ---- */
+  const r = site.resume || {};
+  setText("#resumeIntro", r.intro);
+  if (r.updated) {
+    const u = $("#resumeUpdated");
+    u.textContent = `Last updated ${r.updated}`;
+    u.hidden = false;
+  }
+  if (Array.isArray(r.certs) && r.certs.length) {
+    $("#certs").innerHTML = r.certs
+      .filter(c => c && (c.title || c.issuer))
+      .map(c => `<li>${esc(c.title)}<span>${esc(c.issuer || "")}</span></li>`)
+      .join("");
+  }
+
+  /* ---- contact ---- */
+  const c = site.contact || {};
+  setText("#contactHeading", c.heading);
+  setText("#contactText", c.text);
+  if (c.email || c.linkedin || c.github) {
+    $("#contactActions").innerHTML = [
+      c.email && `<a class="btn primary" href="mailto:${esc(c.email)}">Email me</a>`,
+      c.linkedin && `<a class="btn" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`,
+      c.github && `<a class="btn" href="${esc(c.github)}" target="_blank" rel="noopener">GitHub</a>`
+    ].filter(Boolean).join("");
+  }
+
+  /* ---- footer ---- */
+  setText("#footerLoc", site.footer?.location);
+}
 
 /* --------------------------------------------------------------------------
    A. Intro — the name rises one letter at a time
    -------------------------------------------------------------------------- */
-(() => {
+function initIntro() {
   const h1 = $("[data-split]");
   if (!h1) return;
   const text = h1.textContent;
@@ -22,42 +148,40 @@ window.__jsReady = true;
     .map((c, i) => `<span class="ch" aria-hidden="true" style="--i:${i}">${c === " " ? "&nbsp;" : esc(c)}</span>`)
     .join("");
   requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add("ready")));
-})();
+}
 
 /* --------------------------------------------------------------------------
    B. The job title types itself
    -------------------------------------------------------------------------- */
-(() => {
+function initRoles(roles) {
   const out = $("#roleText");
   if (!out) return;
-  const roles = [
-    "Electrical engineer",
-    "Lead engineer at Orbitalink",
-    "Motor drive researcher",
-    "Satellite tracker builder"
-  ];
+  const list = (roles || []).filter(Boolean);
+  if (!list.length) return;
+
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    out.textContent = roles[0];
+    out.textContent = list[0];
     $(".caret")?.remove();
     return;
   }
-  let r = 0, i = roles[0].length, deleting = true;
+  let r = 0, i = list[0].length, deleting = true;
+  out.textContent = list[0];
   const tick = () => {
-    const w = roles[r];
+    const w = list[r];
     out.textContent = w.slice(0, i);
     if (!deleting && i === w.length) { deleting = true;  return setTimeout(tick, 2200); }
-    if (deleting && i === 0)         { deleting = false; r = (r + 1) % roles.length; return setTimeout(tick, 350); }
+    if (deleting && i === 0)         { deleting = false; r = (r + 1) % list.length; return setTimeout(tick, 350); }
     i += deleting ? -1 : 1;
     setTimeout(tick, deleting ? 32 : 65);
   };
   setTimeout(tick, 2800);
-})();
+}
 
 /* --------------------------------------------------------------------------
    C. Scroll chrome — progress bar, sticky nav, active link, timeline fill
-   One scroll listener, one rAF, everything measured together.
+   Runs after the timeline is rendered, so it measures the real entries.
    -------------------------------------------------------------------------- */
-(() => {
+function initScrollChrome() {
   const bar = $("#progress"), top = $("#topbar"), tl = $("#timeline");
   const dots  = tl ? [...tl.children] : [];
   const links = $$("nav a[href^='#']");
@@ -86,7 +210,7 @@ window.__jsReady = true;
   }, { passive: true });
   addEventListener("resize", update);
   update();
-})();
+}
 
 /* --------------------------------------------------------------------------
    D. Reveal on scroll
@@ -124,9 +248,7 @@ function card(p, i) {
       <h3><a class="stretch" href="projects/${esc(p.slug)}/">${esc(p.title)}</a></h3>
       <p>${esc(p.summary)}</p>
       <div class="tags">${(p.tags || []).slice(0, 4).map(t => `<span>${esc(t)}</span>`).join("")}</div>
-      <button class="peek" type="button" data-i="${i}" aria-haspopup="dialog">
-        Quick look
-      </button>
+      <button class="peek" type="button" data-i="${i}" aria-haspopup="dialog">Quick look</button>
     </div>
   </article>`;
 }
@@ -141,10 +263,7 @@ function chipRow(list, current, attr, label) {
 function render() {
   const grid = $("#grid"), filters = $("#filters");
   if (!grid) return;
-  if (!projects.length) {
-    grid.innerHTML = `<p class="status">No projects to show yet.</p>`;
-    return;
-  }
+  if (!projects.length) { grid.innerHTML = `<p class="status">No projects to show yet.</p>`; return; }
 
   const cats  = ["All", ...new Set(projects.map(p => p.category))];
   const stats = ["All", ...STATUS_ORDER.filter(s => projects.some(p => p.status === s))];
@@ -198,9 +317,9 @@ if (modal) {
 }
 
 /* --------------------------------------------------------------------------
-   F. Menu, year, boot
+   F. Menu, year
    -------------------------------------------------------------------------- */
-(() => {
+function initMenu() {
   const btn = $(".menu-btn"), list = $("#navlist");
   if (!btn || !list) return;
   btn.onclick = () => btn.setAttribute("aria-expanded", list.classList.toggle("open"));
@@ -208,13 +327,27 @@ if (modal) {
     list.classList.remove("open");
     btn.setAttribute("aria-expanded", "false");
   }));
-})();
+}
+
+/* --------------------------------------------------------------------------
+   Boot
+   -------------------------------------------------------------------------- */
+const site = await loadSite();
+applySite(site);
+
+initIntro();
+initRoles(site?.hero?.roles ?? [
+  "Electrical engineer", "Lead engineer at Orbitalink",
+  "Motor drive researcher", "Satellite tracker builder"
+]);
+initScrollChrome();
+initMenu();
+initTheme();
+initHero($("#sky"));
 
 const yr = $("#yr");
 if (yr) yr.textContent = new Date().getFullYear();
 
-initTheme();
-initHero($("#sky"));
 reveals();
 
 try {
