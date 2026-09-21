@@ -327,6 +327,11 @@ nav a.current::after {
   text-transform: uppercase;
   color: var(--muted);
   text-decoration: none;
+  animation: bounce 2.4s ease infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(5px); }
 }
 .scroll-hint:hover { color: var(--accent); }
 
@@ -588,7 +593,6 @@ h3 {
 .meta .cat { color: var(--signal); }
 .card p { margin: 0 0 16px; color: var(--text-2); font-size: .95rem; }
 
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .tags span {
   font: 400 .76rem var(--font-mono);
   padding: 3px 9px;
@@ -596,6 +600,29 @@ h3 {
   background: var(--surface-2);
   color: var(--muted);
   border: 1px solid var(--line-soft);
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  display: grid; place-items: center;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+  opacity: 0; pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity var(--t-fast), transform var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.back-to-top:hover { border-color: var(--accent); color: var(--accent); }
+.back-to-top svg { width: 20px; height: 20px; }
+@media (max-width: 720px) {
+  .back-to-top { bottom: 16px; right: 16px; width: 40px; height: 40px; }
+  .back-to-top svg { width: 18px; height: 18px; }
 }
 
 .status-badge {
@@ -702,7 +729,7 @@ dialog[open] { animation: pop .25s var(--ease); }
 /* --------------------------------------------------------------------------
    9. Skills
    -------------------------------------------------------------------------- */
-.skills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .skill { padding: 20px; }
 .skill h3 {
   font: 500 .78rem/1 var(--font-mono);

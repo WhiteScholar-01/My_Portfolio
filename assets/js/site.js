@@ -161,8 +161,8 @@ function renderContactCard(c) {
   if (!box) return;
   const cells = [
     c.email && { k: "email", label: "Email", href: `mailto:${c.email}`, text: c.email, copy: c.email },
-    c.github && { k: "github", label: "GitHub", href: c.github, text: handle(c.github), ext: true },
-    c.linkedin && { k: "linkedin", label: "LinkedIn", href: c.linkedin, text: handle(c.linkedin, "in/"), ext: true },
+    c.github && { k: "github", label: "GitHub", href: c.github, text: handle(c.github), copy: c.github, ext: true },
+    c.linkedin && { k: "linkedin", label: "LinkedIn", href: c.linkedin, text: handle(c.linkedin, "in/"), copy: c.linkedin, ext: true },
     c.phone && { k: "phone", label: "Phone", href: `tel:${String(c.phone).replace(/[^+\d]/g, "")}`, text: c.phone, copy: c.phone }
   ].filter(Boolean);
   if (!cells.length) return;
@@ -285,6 +285,10 @@ function initScrollChrome() {
     let cur = -1;
     secs.forEach((s, k) => { if (s && s.getBoundingClientRect().top < 140) cur = k; });
     links.forEach((a, k) => a.classList.toggle("current", k === cur));
+    
+    const btt = $("#backToTop");
+    if (btt) btt.classList.toggle("visible", d.scrollTop > innerHeight * 0.5);
+    
     queued = false;
   };
 
@@ -293,6 +297,7 @@ function initScrollChrome() {
   }, { passive: true });
   addEventListener("resize", update);
   update();
+  setTimeout(update, 100);
 }
 
 /* --------------------------------------------------------------------------
@@ -379,7 +384,7 @@ function openModal(p) {
   ].filter(Boolean).join("");
 
   $("#mContent").innerHTML = `
-    ${p.image ? `<div class="m-img"><img src="${esc(url(p.image))}" alt=""></div>` : ""}
+    ${p.image ? `<div class="m-img"><img src="${esc(url(p.image))}" alt="" loading="lazy"></div>` : ""}
     <div class="m-body">
       <div class="meta">
         <span class="cat">${esc(p.category)}${p.status ? " · " + esc(p.status) : ""}</span>
@@ -391,12 +396,14 @@ function openModal(p) {
       <div class="tags" style="margin:18px 0">${(p.tags || []).map(t => `<span>${esc(t)}</span>`).join("")}</div>
       <div class="actions">${links}</div>
     </div>`;
+  document.body.style.overflow = "hidden";
   modal.showModal();
 }
 
 if (modal) {
   $("#mClose").onclick = () => modal.close();
   modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
+  modal.addEventListener("close", () => document.body.style.overflow = "");
 }
 
 /* --------------------------------------------------------------------------
@@ -422,34 +429,40 @@ const projectsPromise = loadProjects()
   .then(all => all.filter(p => p.published !== false))
   .catch(err => { console.error("Couldn't load data/projects.json —", err); return null; });
 
-const site = await sitePromise;
-applySite(site);
+try {
+  const site = await sitePromise;
+  applySite(site);
 
-initIntro();
-initRoles(site?.hero?.roles ?? [
-  "Electrical engineer", "Lead engineer at Orbitalink",
-  "Motor drive researcher", "Satellite tracker builder"
-]);
-initScrollChrome();
-initMenu();
-initTheme();
-initHero($("#sky"));
+  initIntro();
+  initRoles(site?.hero?.roles ?? [
+    "Electrical engineer", "Lead engineer at Orbitalink",
+    "Motor drive researcher", "Satellite tracker builder"
+  ]);
+  initScrollChrome();
+  initMenu();
+  initTheme();
+  initHero($("#sky"));
 
-const yr = $("#yr");
-if (yr) yr.textContent = new Date().getFullYear();
+  const yr = $("#yr");
+  if (yr) yr.textContent = new Date().getFullYear();
 
-reveals();
+  reveals();
 
-const loaded = await projectsPromise;
-if (loaded) {
-  projects = loaded;
-  render();
-  const projStat = $$("#heroStats dd").find(dd => dd.textContent.toLowerCase().includes("project"));
-  if (projStat && projStat.previousElementSibling) {
-    projStat.previousElementSibling.textContent = projects.length;
+  const loaded = await projectsPromise;
+  if (loaded) {
+    projects = loaded;
+    render();
+    const projStat = $$("#heroStats dd").find(dd => dd.textContent.toLowerCase().includes("project"));
+    if (projStat && projStat.previousElementSibling) {
+      projStat.previousElementSibling.textContent = projects.length;
+    }
+  } else {
+    $("#grid").innerHTML = `<p class="status">Projects couldn't load. Check that <code>data/projects.json</code> exists.</p>`;
   }
-} else {
-  $("#grid").innerHTML = `<p class="status">Projects couldn't load. Check that <code>data/projects.json</code> exists.</p>`;
+} catch (e) {
+  console.error("Critical boot failure", e);
+  document.body.classList.add("ready");
+  document.querySelectorAll(".reveal").forEach(n => n.classList.add("in"));
 }
 
 /* The resume preview embeds a PDF. Only fetch it once it is close to the
