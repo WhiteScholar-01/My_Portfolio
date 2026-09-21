@@ -211,7 +211,7 @@ nav a.current::after {
   overflow: hidden;
   padding: calc(var(--nav-h) + 40px) 0 72px;
 }
-#sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+#sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .hero::after {
   content: "";
   position: absolute;
@@ -782,25 +782,23 @@ dialog[open] { animation: pop .25s var(--ease); }
 .contact-card {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
+  gap: 16px;
   max-width: 680px;
   margin: 0 auto;
   text-align: left;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  background: none;
+  border: 0;
+  box-shadow: none;
 }
 .cc {
   position: relative;
-  padding: 20px 24px;
+  padding: 16px 20px;
   min-width: 0;
   background: var(--surface);
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  transition: transform var(--t-fast);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-fast), transform var(--t-fast);
 }
 .cc:hover { border-color: var(--accent-line); transform: translateY(-2px); }
 

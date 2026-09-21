@@ -83,9 +83,9 @@ export function initHero(canvas) {
 
     /* --- geometry --- */
     const R  = narrow ? W * .7 : Math.min(W * .27, H * .62);   // orbit radius
-    const cx = W * .5;                                         // orbit centre,
+    const cx = narrow ? W * .7 : W * .75;                      // orbit centre,
     const cy = narrow ? H * .95 : H * .98;                     // below the horizon
-    const gx = W * .5;                                         // ground station
+    const gx = cx;                                             // ground station
     const gy = H * .86;
     const mastTop = gy - 26;
     const a0 = Math.PI * 1.1, a1 = Math.PI * 1.9;              // arc swept
