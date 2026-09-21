@@ -241,7 +241,10 @@ nav a.current::after {
 }
 
 .hero h1 {
-  font-size: clamp(3rem, 9vw, 6.4rem);
+  /* Type scale: the name, the role and the lede should step down evenly.
+     The old 6.4rem cap put the name 5.8x the size of the intro, which reads
+     as a scaling fault rather than emphasis. 5.25rem gives roughly 3x / 1.5x. */
+  font-size: clamp(2.75rem, 8vw, 5.25rem);
   line-height: .94;
   letter-spacing: -.045em;
   font-weight: 760;
@@ -250,7 +253,8 @@ nav a.current::after {
 .hero h1 .ch { display: inline-block; }
 
 .role {
-  font-size: clamp(1.2rem, 3vw, 1.85rem);
+  /* min raised so the role stays clearly larger than the lede on phones */
+  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
   font-weight: 450;
   color: var(--muted);
   margin: 0 0 22px;
@@ -267,7 +271,15 @@ nav a.current::after {
 }
 @keyframes blink { 50% { opacity: 0; } }
 
-.lede { max-width: 54ch; color: var(--text-2); font-size: 1.1rem; margin: 0 0 32px; }
+.lede {
+  max-width: 56ch;
+  color: var(--text-2);
+  font-size: 1.125rem;
+  margin: 0 0 32px;
+  /* The lede is typed into a textarea, so keep the line breaks the author put
+     there instead of collapsing them into one run of text. */
+  white-space: pre-line;
+}
 
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 

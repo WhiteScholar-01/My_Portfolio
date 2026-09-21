@@ -212,13 +212,29 @@ function initRoles(roles) {
   const list = (roles || []).filter(Boolean);
   if (!list.length) return;
 
+  out.textContent = list[0];
+  if (list.length === 1) { $(".caret")?.remove(); return; }
+
+  /* Reduce-motion is about movement, not about withholding content. The
+     titles still rotate — they just cross-fade instead of typing letter by
+     letter, and the blinking caret goes away. Earlier this branch showed a
+     single static title, which looked like the rotation was broken. */
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    out.textContent = list[0];
     $(".caret")?.remove();
+    out.style.transition = "opacity .35s ease";
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % list.length;
+      out.style.opacity = "0";
+      setTimeout(() => {
+        out.textContent = list[i];
+        out.style.opacity = "1";
+      }, 350);
+    }, 3200);
     return;
   }
+
   let r = 0, i = list[0].length, deleting = true;
-  out.textContent = list[0];
   const tick = () => {
     const w = list[r];
     out.textContent = w.slice(0, i);
