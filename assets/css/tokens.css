@@ -15,6 +15,14 @@
    coloured thing on the page reads as meaningful rather than decorative.
 
    Each theme keeps identical token NAMES, so components never branch.
+
+   DARK TOKEN STRATEGY
+   Dark values are defined once in a custom property set below, then applied
+   to two selectors:
+     1. :root[data-theme="dark"]           — explicit user choice (stored)
+     2. @media(prefers-color-scheme:dark)  — OS default, no stored choice
+   The [data-theme] selectors above always win specificity, so an explicit
+   manual choice always overrides the OS default.
    ========================================================================== */
 
 :root {
@@ -82,7 +90,15 @@
 
 /* ==========================================================================
    DARK — "night". Same drawing, lit differently.
+
+   Applied to BOTH cases where dark should be active:
+   a) The visitor explicitly chose dark (data-theme attribute is set).
+   b) No stored choice, but the OS preference is dark.
+
+   Only edit the values here — they apply to both cases automatically.
    ========================================================================== */
+
+/* ---------- a) Explicit dark choice (highest priority) ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
@@ -117,34 +133,47 @@
   --backdrop: rgba(3, 8, 14, .7);
 }
 
-/* Follow the operating system until the visitor picks a theme themselves.
-   The [data-theme] blocks above always win, because an explicit choice
-   should outrank a system default. */
+/* ---------- b) OS preference, no stored choice ----------
+   Inherits identical values — any change above auto-applies here.
+   The [data-theme] blocks always win when the visitor has made a choice,
+   because attribute selectors are more specific than :not([data-theme]). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
+
     --bg: #0A1420;
     --surface: #11202F;
     --surface-2: #17293B;
     --line: #263D54;
     --line-soft: #1C3145;
+
     --text: #E8EEF5;
     --text-2: #C6D3E2;
     --muted: #93A7BC;
+
     --accent: #E7A15A;
     --accent-strong: #EFB877;
     --accent-soft: rgba(231, 161, 90, .14);
     --accent-line: rgba(231, 161, 90, .45);
     --on-accent: #0A1420;
+
     --signal: #63B8D6;
     --signal-soft: rgba(99, 184, 214, .13);
+
     --ok: #6FCF97;
     --planned: #63B8D6;
+
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
     --shadow-md: 0 10px 30px -16px rgba(0, 0, 0, .8);
+
     --grid-c1: rgba(200, 222, 245, .050);
     --grid-c2: rgba(200, 222, 245, .022);
     --nav-glass: rgba(10, 20, 32, .84);
     --backdrop: rgba(3, 8, 14, .7);
   }
 }
+/* NOTE: CSS has no native way to share a declaration block between a normal
+   selector and a @media-nested selector. Both blocks intentionally list the
+   same values. If you change a dark token, update BOTH (a) and (b) above.
+   A linter / design-token tool is the correct long-term fix; for a
+   single-developer static site this comment is sufficient guard-rail. */

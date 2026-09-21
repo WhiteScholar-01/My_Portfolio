@@ -55,12 +55,26 @@ export function initHero(canvas) {
     my = e.clientY / innerHeight;
   }, { passive: true });
 
-  /** Convert a hex token to rgba() so we can fade it. */
-  const fade = (hex, a) => {
-    const h = String(hex).replace("#", "");
-    if (h.length !== 6) return hex;
-    const n = parseInt(h, 16);
-    return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
+  /**
+   * Convert any valid CSS colour string to rgba() with the given alpha.
+   * Works with hex (#RRGGBB, #RGB), rgb(), hsl(), and named colours.
+   * Falls back to the raw value if parsing fails so nothing goes invisible.
+   */
+  const _fc = document.createElement("canvas");
+  _fc.width = _fc.height = 1;
+  const _fctx = _fc.getContext("2d");
+  const fade = (color, a) => {
+    _fctx.clearRect(0, 0, 1, 1);
+    _fctx.fillStyle = "#000"; // reset
+    _fctx.fillStyle = color;
+    _fctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = _fctx.getImageData(0, 0, 1, 1).data;
+    // If the colour was unparseable the canvas returns black (0,0,0) for
+    // any non-black input — use the raw value as a safe fallback instead.
+    if (r === 0 && g === 0 && b === 0 && !String(color).match(/^#?0{3,6}$|black/i)) {
+      return color;
+    }
+    return `rgba(${r},${g},${b},${a})`;
   };
 
   function draw(t) {
