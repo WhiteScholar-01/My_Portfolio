@@ -13,7 +13,7 @@ import { currentTheme } from "./theme.js";
 export function initHero(canvas) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = false; // matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let W = 0, H = 0, dpr = 1, stars = [], C = {}, dark = false;
 

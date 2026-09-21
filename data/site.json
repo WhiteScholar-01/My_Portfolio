@@ -19,8 +19,8 @@
       "label": "Projects"
     },
     {
-      "value": "2",
-      "label": "Years at Orbitalink"
+      "value": "1+",
+      "label": "Year at Orbitalink"
     },
     {
       "value": "2026",
@@ -106,12 +106,18 @@
         "items": [
           "FOC",
           "MTPA",
-          "PID Control"
+          "Flux weakening",
+          "DTC",
+          "SVPWM",
+          "Adaptive PID",
+          "DC-DC converters"
         ]
       },
       {
         "title": "Embedded",
         "items": [
+          "C / C++",
+          "TI C2000",
           "STM32",
           "Arduino",
           "I2C",
@@ -133,13 +139,16 @@
           "Simulink",
           "Python",
           "scikit-learn",
+          "JavaScript",
+          "Node.js",
           "Git"
         ]
       },
       {
         "title": "Mechanical Design",
         "items": [
-          "Fusion 360"
+          "Fusion 360",
+          "FEA"
         ]
       },
       {
@@ -173,8 +182,7 @@
     "text": "Open to research collaborations, internships and engineering roles in cybersecurity in Digital Twin, motor drives, control and ground station systems.",
     "email": "saqibali1729@gmail.com",
     "linkedin": "https://www.linkedin.com/in/saqib-a-2a3a01287",
-    "github": "https://github.com/WhiteScholar-01",
-    "phone": "+918923002746"
+    "github": "https://github.com/WhiteScholar-01"
   },
   "footer": {
     "location": "Aligarh, India"

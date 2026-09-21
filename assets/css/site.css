@@ -780,11 +780,10 @@ dialog[open] { animation: pop .25s var(--ease); }
    Values are printed rather than hidden behind a button, because a mailto:
    link does nothing on a machine with no mail client configured. */
 .contact-card {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 680px;
   margin: 0 auto;
   text-align: left;
   /* the container itself is not a card any more */
@@ -794,8 +793,6 @@ dialog[open] { animation: pop .25s var(--ease); }
 }
 .cc {
   position: relative;
-  flex: 1 1 240px;
-  max-width: 340px;
   padding: 14px 18px;
   min-width: 0;
   background: var(--surface);
@@ -846,7 +843,7 @@ dialog[open] { animation: pop .25s var(--ease); }
 .cc-copy.done { color: var(--ok); border-color: var(--ok); }
 
 @media (max-width: 560px) {
-  .cc { flex: 1 1 100%; max-width: none; }
+  .contact-card { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -444,6 +444,10 @@ const loaded = await projectsPromise;
 if (loaded) {
   projects = loaded;
   render();
+  const projStat = $$("#heroStats dd").find(dd => dd.textContent.toLowerCase().includes("project"));
+  if (projStat && projStat.previousElementSibling) {
+    projStat.previousElementSibling.textContent = projects.length;
+  }
 } else {
   $("#grid").innerHTML = `<p class="status">Projects couldn't load. Check that <code>data/projects.json</code> exists.</p>`;
 }
