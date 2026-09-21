@@ -128,10 +128,15 @@ function render(p, list, idx) {
   $("#pCrumbCat").textContent = p.category || "Project";
   $("#pSpecs").innerHTML = renderSpecs(p);
 
-  $("#pHighlights").innerHTML = p.details?.length
+  const ndaWarning = p.nda ? `<div class="nda-warning">
+    <strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> CONFIDENTIAL PROJECT</strong>
+    <p>Developed during a research internship under a non-disclosure agreement. Schematics, layout, bill of materials, component selection and repository access are withheld. The description below is limited to design capability.</p>
+  </div>` : "";
+
+  $("#pHighlights").innerHTML = ndaWarning + (p.details?.length
     ? `<ul class="highlights">${p.details.map(d => `<li>${esc(d)}</li>`).join("")}</ul>`
     : `<p class="muted">Write-up in progress. The notes for this project live in
-       <code>projects/${esc(p.slug)}/README.md</code>.</p>`;
+       <code>projects/${esc(p.slug)}/README.md</code>.</p>`);
 
   $("#pSections").innerHTML = renderSections(p);
   $("#pGallery").innerHTML = renderGallery(p);

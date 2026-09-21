@@ -79,7 +79,7 @@
           <input name="org"></label>
 
         <label>Status<select name="status">
-          <option>In progress</option><option>Completed</option>
+          <option>In progress</option><option>Completed</option><option>Concluded</option>
           <option>Planned</option><option>On hold</option>
         </select></label>
         <label>Area<select name="category">
@@ -89,6 +89,11 @@
         </select></label>
 
         <label>Year<input name="year" placeholder="2026"></label>
+        
+        <label class="cb-label full" style="margin-top:8px">
+          <input type="checkbox" name="nda">
+          Under Non-Disclosure Agreement (NDA)
+        </label>
         <label>Cover image<input type="file" name="file" accept="image/*">
           <span class="hint">resized, saved to that project's images folder</span></label>
 

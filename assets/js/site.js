@@ -396,6 +396,10 @@ function openModal(p) {
         <span>${esc(p.year || "")}</span>
       </div>
       <h3 id="mTitle">${esc(p.title)}</h3>
+      ${p.nda ? `<div class="nda-warning">
+        <strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> CONFIDENTIAL PROJECT</strong>
+        <p>Developed during a research internship under a non-disclosure agreement. Schematics, layout, bill of materials, component selection and repository access are withheld. The description below is limited to design capability.</p>
+      </div>` : ""}
       <p class="muted">${esc(p.summary)}</p>
       ${p.details?.length ? `<ul>${p.details.map(d => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}
       <div class="tags" style="margin:18px 0">${(p.tags || []).map(t => `<span>${esc(t)}</span>`).join("")}</div>

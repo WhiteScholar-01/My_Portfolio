@@ -625,6 +625,33 @@ h3 {
   .back-to-top svg { width: 18px; height: 18px; }
 }
 
+.nda-warning {
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  background: var(--accent-soft);
+  margin: 16px 0;
+}
+.nda-warning strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font: 500 .8rem var(--font-mono);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.nda-warning svg {
+  width: 16px;
+  height: 16px;
+}
+.nda-warning p {
+  margin: 0;
+  font-size: .95rem;
+  color: var(--text-2);
+}
+
 .status-badge {
   position: absolute;
   top: 10px; left: 10px;

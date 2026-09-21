@@ -29,7 +29,7 @@ export function url(path, base = "") {
   return base + String(path).replace(/^\/+/, "");
 }
 
-export const STATUS_ORDER = ["In progress", "Completed", "Planned", "On hold"];
+export const STATUS_ORDER = ["In progress", "Completed", "Concluded", "Planned", "On hold"];
 
 /** Line-drawn placeholder for a project with no image yet. */
 export const PLACEHOLDER = `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor"

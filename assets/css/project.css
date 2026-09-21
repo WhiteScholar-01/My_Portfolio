@@ -92,6 +92,33 @@
   background: var(--line);
 }
 
+.nda-warning {
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  background: var(--accent-soft);
+  margin-bottom: 24px;
+}
+.nda-warning strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font: 500 .8rem var(--font-mono);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.nda-warning svg {
+  width: 16px;
+  height: 16px;
+}
+.nda-warning p {
+  margin: 0;
+  font-size: .95rem;
+  color: var(--text-2);
+}
+
 .highlights { margin: 0; padding-left: 1.15em; color: var(--text-2); }
 .highlights li { margin-bottom: 10px; }
 .highlights li::marker { color: var(--accent); }

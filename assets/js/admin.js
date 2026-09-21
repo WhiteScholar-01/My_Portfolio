@@ -203,6 +203,7 @@ function fillForm(p, i) {
   form.tags.value = (p.tags || []).join(", ");
   form.published.checked = p.published !== false;
   form.featured.checked = !!p.featured;
+  form.nda.checked = !!p.nda;
 
   draftGallery = (p.gallery || []).map(g => typeof g === "string" ? { src: g, caption: "" } : { ...g });
   draftSections = (p.sections || []).map(s => ({ ...s }));
@@ -539,6 +540,7 @@ form.onsubmit = async e => {
       status: form.status.value,
       featured: form.featured.checked,
       published: form.published.checked,
+      nda: form.nda.checked,
       summary: form.summary.value.trim(),
       details: form.details.value.split("\n").map(s => s.trim()).filter(Boolean),
       tags: form.tags.value.split(",").map(s => s.trim()).filter(Boolean),
