@@ -106,8 +106,7 @@
         "items": [
           "FOC",
           "MTPA",
-          "PID",
-          "DC-DC converters"
+          "PID"
         ]
       },
       {
