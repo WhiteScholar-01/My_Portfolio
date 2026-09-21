@@ -106,7 +106,7 @@
         "items": [
           "FOC",
           "MTPA",
-          "PID"
+          "PID Control"
         ]
       },
       {
@@ -115,7 +115,7 @@
           "STM32",
           "Arduino",
           "I2C",
-          "Servo drives"
+          "Servo Control"
         ]
       },
       {
