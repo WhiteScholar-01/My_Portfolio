@@ -330,6 +330,25 @@ nav a.current::after {
 }
 .scroll-hint:hover { color: var(--accent); }
 
+/* On a tall phone a full 100svh hero with centred content leaves a whole
+   screen of empty starfield above the name. Let it size to its content
+   instead, and top-align so the name is the first thing in view. */
+@media (max-width: 720px) {
+  .hero {
+    min-height: auto;
+    align-items: flex-start;
+    padding: calc(var(--nav-h) + 40px) 0 56px;
+  }
+  /* The canvas fills the hero box, which is now short — keep it from
+     collapsing to nothing so the pass is still readable behind the text.
+     Hold it back further than on desktop: in a shorter box the drawing sits
+     directly under the stats, and at full strength it fights the text. */
+  #sky { min-height: 380px; opacity: .5; }
+  .hero::after { height: 90px; }
+  /* A "scroll" cue is meaningless when the next section is already on screen. */
+  .scroll-hint { display: none; }
+}
+
 /* --------------------------------------------------------------------------
    4. Buttons
    -------------------------------------------------------------------------- */
@@ -757,26 +776,35 @@ dialog[open] { animation: pop .25s var(--ease); }
 .contact p { color: var(--muted); max-width: 50ch; margin: 0 auto 30px; }
 .contact .actions { justify-content: center; }
 
-/* Contact card — values printed, not hidden behind buttons. */
+/* Contact: one separate tag per channel, not a single fused block.
+   Values are printed rather than hidden behind a button, because a mailto:
+   link does nothing on a machine with no mail client configured. */
 .contact-card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  max-width: 660px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 760px;
   margin: 0 auto;
   text-align: left;
-  overflow: hidden;
+  /* the container itself is not a card any more */
+  background: none;
+  border: 0;
+  box-shadow: none;
 }
 .cc {
   position: relative;
-  padding: 18px 22px;
+  flex: 1 1 240px;
+  max-width: 340px;
+  padding: 14px 18px;
   min-width: 0;
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-fast), transform var(--t-fast);
 }
-.cc:nth-child(-n+2) { border-top: 0; }
-.cc:nth-child(odd)  { border-left: 0; }
-/* An odd last cell takes the full width so the grid never ends ragged. */
-.cc:nth-child(odd):last-child { grid-column: 1 / -1; border-left: 0; }
+.cc:hover { border-color: var(--accent-line); transform: translateY(-2px); }
 
 .cc-label {
   display: flex;
@@ -802,7 +830,7 @@ dialog[open] { animation: pop .25s var(--ease); }
 
 .cc-copy {
   position: absolute;
-  top: 15px; right: 14px;
+  top: 12px; right: 12px;
   font: 500 .7rem var(--font-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -818,9 +846,11 @@ dialog[open] { animation: pop .25s var(--ease); }
 .cc-copy.done { color: var(--ok); border-color: var(--ok); }
 
 @media (max-width: 560px) {
-  .contact-card { grid-template-columns: 1fr; }
-  .cc { border-left: 0; border-top: 1px solid var(--line); }
-  .cc:first-child { border-top: 0; }
+  .cc { flex: 1 1 100%; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc:hover { transform: none; }
 }
 
 footer {

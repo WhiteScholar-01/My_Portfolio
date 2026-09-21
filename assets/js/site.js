@@ -21,7 +21,10 @@ window.__jsReady = true;
    -------------------------------------------------------------------------- */
 async function loadSite() {
   try {
-    const res = await fetch(`data/site.json?t=${Date.now()}`, { cache: "no-store" });
+    // "no-cache" revalidates but still allows a 304, so a repeat visit costs
+    // headers instead of the whole file. "no-store" forced a full download
+    // on every single page view.
+    const res = await fetch("data/site.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(res.status);
     return await res.json();
   } catch (err) {
@@ -165,7 +168,7 @@ function renderContactCard(c) {
   if (!cells.length) return;
 
   box.innerHTML = cells.map(cell => `
-    <div class="cc">
+    <div class="cc sheet">
       <span class="cc-label">${ICON[cell.k]}${esc(cell.label)}</span>
       <a class="cc-value" href="${esc(cell.href)}"${cell.ext ? ' target="_blank" rel="noopener"' : ""}>${esc(cell.text)}</a>
       ${cell.copy ? `<button class="cc-copy" type="button" data-copy="${esc(cell.copy)}" aria-label="Copy ${esc(cell.label).toLowerCase()}">Copy</button>` : ""}
@@ -213,37 +216,48 @@ function initRoles(roles) {
   if (!list.length) return;
 
   out.textContent = list[0];
-  if (list.length === 1) { $(".caret")?.remove(); return; }
+  if (list.length === 1) { $(".caret")?.setAttribute("hidden", ""); return; }
 
-  /* Reduce-motion is about movement, not about withholding content. The
-     titles still rotate — they just cross-fade instead of typing letter by
-     letter, and the blinking caret goes away. Earlier this branch showed a
-     single static title, which looked like the rotation was broken. */
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    $(".caret")?.remove();
-    out.style.transition = "opacity .35s ease";
-    let i = 0;
-    setInterval(() => {
+  const mq = matchMedia("(prefers-reduced-motion: reduce)");
+  const caret = $(".caret");
+  let timer = null, i = 0;
+
+  const stop = () => { clearTimeout(timer); clearInterval(timer); timer = null; };
+
+  /* Reduce-motion is about movement, not about withholding content, so the
+     titles still cycle — they cross-fade instead of typing, with no caret. */
+  const crossFade = () => {
+    caret?.setAttribute("hidden", "");
+    out.style.transition = "opacity .3s ease";
+    out.style.opacity = "1";
+    timer = setInterval(() => {
       i = (i + 1) % list.length;
       out.style.opacity = "0";
-      setTimeout(() => {
-        out.textContent = list[i];
-        out.style.opacity = "1";
-      }, 350);
-    }, 3200);
-    return;
-  }
-
-  let r = 0, i = list[0].length, deleting = true;
-  const tick = () => {
-    const w = list[r];
-    out.textContent = w.slice(0, i);
-    if (!deleting && i === w.length) { deleting = true;  return setTimeout(tick, 2200); }
-    if (deleting && i === 0)         { deleting = false; r = (r + 1) % list.length; return setTimeout(tick, 350); }
-    i += deleting ? -1 : 1;
-    setTimeout(tick, deleting ? 32 : 65);
+      setTimeout(() => { out.textContent = list[i]; out.style.opacity = "1"; }, 300);
+    }, 2600);
   };
-  setTimeout(tick, 2800);
+
+  const typewriter = () => {
+    caret?.removeAttribute("hidden");
+    out.style.transition = "";
+    out.style.opacity = "1";
+    let n = list[i].length, deleting = true;
+    const tick = () => {
+      const w = list[i];
+      out.textContent = w.slice(0, n);
+      if (!deleting && n === w.length) { deleting = true;  timer = setTimeout(tick, 1800); return; }
+      if (deleting && n === 0)         { deleting = false; i = (i + 1) % list.length; timer = setTimeout(tick, 280); return; }
+      n += deleting ? -1 : 1;
+      timer = setTimeout(tick, deleting ? 28 : 55);
+    };
+    // Short lead-in: a rotation nobody waits around for looks broken.
+    timer = setTimeout(tick, 1200);
+  };
+
+  const start = () => { stop(); (mq.matches ? crossFade : typewriter)(); };
+  start();
+  // If the visitor flips "reduce motion" while the page is open, switch modes.
+  mq.addEventListener?.("change", start);
 }
 
 /* --------------------------------------------------------------------------
@@ -401,7 +415,14 @@ function initMenu() {
 /* --------------------------------------------------------------------------
    Boot
    -------------------------------------------------------------------------- */
-const site = await loadSite();
+/* Both data files are needed, and neither depends on the other — so ask for
+   them at the same time rather than one after the other. */
+const sitePromise = loadSite();
+const projectsPromise = loadProjects()
+  .then(all => all.filter(p => p.published !== false))
+  .catch(err => { console.error("Couldn't load data/projects.json —", err); return null; });
+
+const site = await sitePromise;
 applySite(site);
 
 initIntro();
@@ -419,10 +440,24 @@ if (yr) yr.textContent = new Date().getFullYear();
 
 reveals();
 
-try {
-  projects = (await loadProjects()).filter(p => p.published !== false);
+const loaded = await projectsPromise;
+if (loaded) {
+  projects = loaded;
   render();
-} catch (err) {
-  console.error("Couldn't load data/projects.json —", err);
+} else {
   $("#grid").innerHTML = `<p class="status">Projects couldn't load. Check that <code>data/projects.json</code> exists.</p>`;
 }
+
+/* The resume preview embeds a PDF. Only fetch it once it is close to the
+   viewport — on a phone the preview is display:none and it is never fetched
+   at all, which saves the whole file on the platform that can least afford it. */
+(() => {
+  const obj = $("#resumePreview");
+  if (!obj || !obj.dataset.pdf) return;
+  const load = () => { obj.data = obj.dataset.pdf; };
+  if (!("IntersectionObserver" in window)) return load();
+  const io = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)) { load(); io.disconnect(); }
+  }, { rootMargin: "600px" });
+  io.observe(obj);
+})();

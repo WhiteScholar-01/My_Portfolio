@@ -207,7 +207,28 @@ export function initHero(canvas) {
   addEventListener("resize", resize);
   addEventListener("themechange", readPalette);
 
+  /* Reduced motion: draw the scene once and stop. A background that animates
+     forever is exactly what that preference asks us not to do, and stopping it
+     gives every visitor who set it their battery back. */
+  if (reduced) {
+    const redraw = () => draw(0);
+    addEventListener("resize", redraw);
+    addEventListener("themechange", redraw);
+    draw(0);
+    return;
+  }
+
   let visible = true;
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
-  (function loop(t) { if (visible) draw(t); requestAnimationFrame(loop); })(0);
+
+  /* A drifting starfield does not need 60 fps, and on a phone those extra
+     frames are pure heat. Halve the rate on small screens. */
+  const minFrameMs = innerWidth < 720 ? 1000 / 30 : 1000 / 60;
+  let last = -Infinity;
+  (function loop(t) {
+    requestAnimationFrame(loop);
+    if (!visible || t - last < minFrameMs) return;
+    last = t;
+    draw(t);
+  })(0);
 }

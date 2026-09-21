@@ -43,7 +43,9 @@ export const PLACEHOLDER = `<svg viewBox="0 0 48 48" fill="none" stroke="current
  * title, so an entry added through the admin page still resolves to a folder.
  */
 export async function loadProjects(base = "") {
-  const res = await fetch(`${base}data/projects.json?t=${Date.now()}`, { cache: "no-store" });
+  // Revalidate rather than refuse the cache: a 304 costs headers, a
+  // "no-store" fetch costs the whole file on every page view.
+  const res = await fetch(`${base}data/projects.json`, { cache: "no-cache" });
   if (!res.ok) throw new Error(`projects.json returned ${res.status}`);
   const all = await res.json();
   return all.map(p => ({ ...p, slug: p.slug || slugify(p.title) }));
