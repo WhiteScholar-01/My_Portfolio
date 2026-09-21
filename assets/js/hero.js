@@ -83,9 +83,9 @@ export function initHero(canvas) {
 
     /* --- geometry --- */
     const R  = narrow ? W * .7 : Math.min(W * .27, H * .62);   // orbit radius
-    const cx = narrow ? W * .62 : W * .75;                     // orbit centre,
+    const cx = W * .5;                                         // orbit centre,
     const cy = narrow ? H * .95 : H * .98;                     // below the horizon
-    const gx = narrow ? W * .84 : W * .8;                      // ground station
+    const gx = W * .5;                                         // ground station
     const gy = H * .86;
     const mastTop = gy - 26;
     const a0 = Math.PI * 1.1, a1 = Math.PI * 1.9;              // arc swept
@@ -219,7 +219,9 @@ export function initHero(canvas) {
   }
 
   let visible = true;
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
+  }
 
   /* A drifting starfield does not need 60 fps, and on a phone those extra
      frames are pure heat. Halve the rate on small screens. */

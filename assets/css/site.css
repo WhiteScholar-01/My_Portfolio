@@ -782,24 +782,25 @@ dialog[open] { animation: pop .25s var(--ease); }
 .contact-card {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 1px;
   max-width: 680px;
   margin: 0 auto;
   text-align: left;
-  /* the container itself is not a card any more */
-  background: none;
-  border: 0;
-  box-shadow: none;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .cc {
   position: relative;
-  padding: 14px 18px;
+  padding: 20px 24px;
   min-width: 0;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--t-fast), transform var(--t-fast);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: transform var(--t-fast);
 }
 .cc:hover { border-color: var(--accent-line); transform: translateY(-2px); }
 
