@@ -370,6 +370,11 @@ function render() {
     ? shown.map(([p, i]) => card(p, i)).join("")
     : `<p class="status">Nothing matches those filters.</p>`;
 
+  // Trigger a brief fade-in so the swap feels intentional, not jarring
+  grid.classList.remove("filtering");
+  void grid.offsetWidth; // force reflow so the animation restarts each time
+  grid.classList.add("filtering");
+
   $$(".peek", grid).forEach(b => b.onclick = () => openModal(projects[+b.dataset.i]));
   reveals();
 }
