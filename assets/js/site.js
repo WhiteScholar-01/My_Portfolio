@@ -129,6 +129,48 @@ function applySite(site) {
   setText("#contactText", c.text);
   renderContactCard(c);
 
+  /* ---- docs (CV, Resume, profile photo) ---- */
+  const d = site.docs || {};
+
+  // Resume download button in hero
+  if (d.resumePath) {
+    const heroResume = $("#heroResume");
+    if (heroResume) {
+      heroResume.href = d.resumePath;
+      heroResume.download = d.resumePath.split("/").pop();
+    }
+  }
+  // Resume section view/download links
+  if (d.resumePath) {
+    document.querySelectorAll(".doc-resume-view").forEach(el => { el.href = d.resumePath; });
+    document.querySelectorAll(".doc-resume-dl").forEach(el => {
+      el.href = d.resumePath;
+      el.download = d.resumePath.split("/").pop();
+    });
+    const previewObj = $("#resumePreview");
+    if (previewObj) previewObj.dataset.pdf = d.resumePath + "#view=FitH&toolbar=0";
+    const previewLink = $("#resumePreviewLink");
+    if (previewLink) previewLink.href = d.resumePath;
+  }
+  // CV view/download links
+  if (d.cvPath) {
+    document.querySelectorAll(".doc-cv-view").forEach(el => { el.href = d.cvPath; });
+    document.querySelectorAll(".doc-cv-dl").forEach(el => {
+      el.href = d.cvPath;
+      el.download = d.cvPath.split("/").pop();
+    });
+  }
+  // Profile photo (optional)
+  const photoEl = $("#profilePhoto");
+  if (photoEl) {
+    if (d.profilePhoto) {
+      photoEl.src = d.profilePhoto;
+      photoEl.hidden = false;
+    } else {
+      photoEl.hidden = true;
+    }
+  }
+
   /* ---- footer ---- */
   setText("#footerLoc", site.footer?.location);
 }

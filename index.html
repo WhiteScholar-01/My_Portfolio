@@ -130,8 +130,7 @@ setTimeout(function () {
     <a class="scroll-hint" href="#about">Scroll</a>
   </section>
 
-  <!-- ===================== ABOUT ===================== -->
-  <section class="block" id="about">
+    <section class="block" id="about">
     <div class="wrap about">
       <div class="reveal">
         <div class="sec-head">
@@ -146,6 +145,9 @@ setTimeout(function () {
         </div>
       </div>
       <div class="panel sheet ticked reveal">
+        <!-- Optional profile photo — shown only when uploaded via the admin panel -->
+        <img id="profilePhoto" src="" alt="Profile photo" hidden
+          style="width:100%;max-width:200px;border-radius:var(--r-md);object-fit:cover;margin-bottom:16px;display:block">
         <dl id="aboutPanel">
           <div><dt>Studying</dt><dd>B.Tech EE, AMU · 2027</dd></div>
           <div><dt>Current role</dt><dd>Lead Engineer, Orbitalink</dd></div>
@@ -245,15 +247,15 @@ setTimeout(function () {
         <div class="doc sheet">
           <div><h3>Resume</h3><span class="muted">1 page · PDF</span></div>
           <div class="btns">
-            <a class="btn small" href="assets/docs/Saqib_Ali_Resume.pdf" target="_blank" rel="noopener">View</a>
-            <a class="btn small primary" href="assets/docs/Saqib_Ali_Resume.pdf" download="Saqib_Ali_Resume.pdf">Download</a>
+            <a class="btn small doc-resume-view" href="assets/docs/Saqib_Ali_Resume.pdf" target="_blank" rel="noopener">View</a>
+            <a class="btn small primary doc-resume-dl" href="assets/docs/Saqib_Ali_Resume.pdf" download="Saqib_Ali_Resume.pdf">Download</a>
           </div>
         </div>
         <div class="doc sheet">
           <div><h3>Full CV</h3><span class="muted">2 pages · PDF</span></div>
           <div class="btns">
-            <a class="btn small" href="assets/docs/Saqib_Ali_CV.pdf" target="_blank" rel="noopener">View</a>
-            <a class="btn small primary" href="assets/docs/Saqib_Ali_CV.pdf" download="Saqib_Ali_CV.pdf">Download</a>
+            <a class="btn small doc-cv-view" href="assets/docs/Saqib_Ali_CV.pdf" target="_blank" rel="noopener">View</a>
+            <a class="btn small primary doc-cv-dl" href="assets/docs/Saqib_Ali_CV.pdf" download="Saqib_Ali_CV.pdf">Download</a>
           </div>
         </div>
         <p class="updated" id="resumeUpdated" hidden></p>
@@ -267,7 +269,7 @@ setTimeout(function () {
         <object id="resumePreview" data-pdf="assets/docs/Saqib_Ali_Resume.pdf#view=FitH&amp;toolbar=0"
                 type="application/pdf" aria-label="Resume preview">
           <p class="status" style="padding:24px">Preview not available.
-            <a href="assets/docs/Saqib_Ali_Resume.pdf" target="_blank" rel="noopener">Open the resume</a>.</p>
+            <a id="resumePreviewLink" href="assets/docs/Saqib_Ali_Resume.pdf" target="_blank" rel="noopener">Open the resume</a>.</p>
         </object>
       </div>
     </div>

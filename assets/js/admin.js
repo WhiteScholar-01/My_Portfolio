@@ -130,6 +130,7 @@ async function connectAndLoad() {
     dirtyCheck();
     await siteEditor.load();
     siteEditor.mount();
+    siteEditor.setApiCfg(() => cfg);
   } catch (err) {
     say($("#connectMsg"), err.message);
     localStorage.removeItem(KEY);

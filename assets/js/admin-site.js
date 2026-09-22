@@ -24,13 +24,13 @@ const SPEC = [
     key: "hero", title: "Hero",
     hint: "The first screen. Leave the eyebrow empty to hide it.",
     fields: [
-      { k: "eyebrow",     label: "Eyebrow", type: "text", hint: "small line above your name — empty hides it" },
-      { k: "name",        label: "Name", type: "text" },
-      { k: "roles",       label: "Rotating job titles", type: "lines", hint: "one per line; they type themselves in turn" },
-      { k: "lede",        label: "Intro paragraph", type: "area" },
-      { k: "ctaLabel",    label: "Main button label", type: "text" },
-      { k: "ctaHref",     label: "Main button link", type: "text" },
-      { k: "resumeLabel", label: "Resume button label", type: "text" }
+      { k: "eyebrow",      label: "Eyebrow", type: "text", hint: "small line above your name — empty hides it" },
+      { k: "name",         label: "Name", type: "text" },
+      { k: "roles",        label: "Rotating job titles", type: "lines", hint: "one per line; they type themselves in turn" },
+      { k: "lede",         label: "Intro paragraph", type: "area" },
+      { k: "ctaLabel",     label: "Main button label", type: "text" },
+      { k: "ctaHref",      label: "Main button link", type: "text" },
+      { k: "resumeLabel",  label: "Resume button label", type: "text" }
     ]
   },
   {
@@ -200,7 +200,7 @@ export function createSiteEditor(api) {
         ${(g.fields || []).map(f => `
           <label class="ed-field">
             <span>${esc(f.label)}${f.hint ? ` <em class="hint">${esc(f.hint)}</em>` : ""}</span>
-            ${control(f, site[g.key]?.[f.k], `data-g="${esc(g.key)}" data-k="${esc(f.k)}" data-t="${f.type}"`)}
+            ${control(f, site[g.key]?.[f.k], `data-g="${esc(g.key)}" data-k="${esc(f.k)}" data-t="${f.type}"`)}\
           </label>`).join("")}
 
         ${g.topLevelList ? `
@@ -221,10 +221,170 @@ export function createSiteEditor(api) {
             </div>
             ${listRows(g.key, l)}
           </div>`).join("")}
-      </section>`).join("");
+      </section>`).join("") + renderDocsCard();
 
+    // Re-attach file input handlers after re-render
+    attachDocsHandlers();
     markDirty();
   }
+
+  /* ---- Docs & Profile Photo card ---- */
+  function docsPath(key) {
+    return (site.docs || {})[key] || "";
+  }
+  function renderDocsCard() {
+    const d = site.docs || {};
+    const photoSrc = d.profilePhoto
+      ? `https://raw.githubusercontent.com/${__cfg().owner}/${__cfg().repo}/${__cfg().branch}/${d.profilePhoto}`
+      : "";
+    return `
+    <section class="card" id="docsCard">
+      <h2>Documents &amp; Profile Photo</h2>
+      <p class="hint" style="margin:-8px 0 14px">Upload files directly — they are saved to <code>assets/docs/</code> or <code>assets/img/</code> on GitHub. Paths are stored in <code>site.json</code> and picked up automatically by the site.</p>
+
+      <div class="doc-row">
+        <div class="doc-info">
+          <b>Resume</b>
+          <span class="hint">${esc(d.resumePath || "assets/docs/Saqib_Ali_Resume.pdf")}</span>
+        </div>
+        <label class="btn small" style="cursor:pointer">
+          Replace file
+          <input type="file" accept=".pdf" id="resumeUpload" style="display:none">
+        </label>
+        <span class="hint" id="resumeMsg"></span>
+      </div>
+
+      <div class="doc-row">
+        <div class="doc-info">
+          <b>Full CV</b>
+          <span class="hint">${esc(d.cvPath || "assets/docs/Saqib_Ali_CV.pdf")}</span>
+        </div>
+        <label class="btn small" style="cursor:pointer">
+          Replace file
+          <input type="file" accept=".pdf" id="cvUpload" style="display:none">
+        </label>
+        <span class="hint" id="cvMsg"></span>
+      </div>
+
+      <div class="doc-row" style="align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <div class="doc-info">
+          <b>Profile photo</b>
+          <span class="hint">Optional — shown in the About section. Leave empty to hide it.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+          ${photoSrc ? `<img src="${esc(photoSrc)}" alt="Profile" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--line)">` : ""}
+          <label class="btn small" style="cursor:pointer">
+            ${photoSrc ? "Replace photo" : "Upload photo"}
+            <input type="file" accept="image/*" id="photoUpload" style="display:none">
+          </label>
+          ${photoSrc ? `<button class="btn small danger" type="button" id="photoRemove">Remove photo</button>` : ""}
+          <span class="hint" id="photoMsg"></span>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  /* Keep a ref to the api.cfg so the docs card can build raw GitHub URLs */
+  let __cfg = () => ({});
+  function setApiCfg(fn) { __cfg = fn; }
+
+  function readFileAsB64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result.split(",")[1]);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  async function uploadDocFile(file, destPath, msgEl) {
+    msgEl.textContent = `Uploading ${file.name}…`;
+    try {
+      const b64 = await readFileAsB64(file);
+      // Check if file already exists (need its sha to overwrite)
+      const existing = await api.gh(`${destPath}?ref=${api.ref()}`, {}, true);
+      await api.put(destPath, b64, `Update ${destPath}`, existing?.sha);
+      msgEl.textContent = "✓ Uploaded";
+      setTimeout(() => { msgEl.textContent = ""; }, 3000);
+      return destPath;
+    } catch (err) {
+      msgEl.textContent = "Error: " + err.message;
+      throw err;
+    }
+  }
+
+  function attachDocsHandlers() {
+    const resumeEl = document.getElementById("resumeUpload");
+    const cvEl     = document.getElementById("cvUpload");
+    const photoEl  = document.getElementById("photoUpload");
+    const removeEl = document.getElementById("photoRemove");
+
+    if (resumeEl) {
+      resumeEl.onchange = async () => {
+        const f = resumeEl.files[0]; if (!f) return;
+        const msg = document.getElementById("resumeMsg");
+        const dest = `assets/docs/${f.name}`;
+        try {
+          await uploadDocFile(f, dest, msg);
+          site.docs ??= {};
+          site.docs.resumePath = dest;
+          saved = ""; // mark dirty
+          markDirty();
+          // save site.json immediately so the path persists
+          await save(true);
+          render();
+        } catch {}
+      };
+    }
+
+    if (cvEl) {
+      cvEl.onchange = async () => {
+        const f = cvEl.files[0]; if (!f) return;
+        const msg = document.getElementById("cvMsg");
+        const dest = `assets/docs/${f.name}`;
+        try {
+          await uploadDocFile(f, dest, msg);
+          site.docs ??= {};
+          site.docs.cvPath = dest;
+          saved = "";
+          markDirty();
+          await save(true);
+          render();
+        } catch {}
+      };
+    }
+
+    if (photoEl) {
+      photoEl.onchange = async () => {
+        const f = photoEl.files[0]; if (!f) return;
+        const msg = document.getElementById("photoMsg");
+        const ext = f.name.split(".").pop() || "jpg";
+        const dest = `assets/img/profile.${ext}`;
+        try {
+          await uploadDocFile(f, dest, msg);
+          site.docs ??= {};
+          site.docs.profilePhoto = dest;
+          saved = "";
+          markDirty();
+          await save(true);
+          render();
+        } catch {}
+      };
+    }
+
+    if (removeEl) {
+      removeEl.onclick = async () => {
+        site.docs ??= {};
+        delete site.docs.profilePhoto;
+        saved = "";
+        markDirty();
+        await save(true);
+        render();
+      };
+    }
+  }
+
+
 
   /* ---- editing ---- */
   const arrayAt = (g, l) => (g ? site[g][l] : site[l]);
@@ -274,10 +434,9 @@ export function createSiteEditor(api) {
   }
 
   /* ---- save ---- */
-  async function save() {
+  async function save(silent = false) {
     const out = $("#siteMsg");
-    out.textContent = "Saving…";
-    out.className = "msg ok";
+    if (!silent) { out.textContent = "Saving…"; out.className = "msg ok"; }
     try {
       const res = await api.put(
         PATH,
@@ -288,7 +447,7 @@ export function createSiteEditor(api) {
       sha = res.content.sha;
       saved = JSON.stringify(site);
       markDirty();
-      out.textContent = "Saved. The site updates in 1–2 minutes — run git pull locally to catch up.";
+      if (!silent) out.textContent = "Saved. The site updates in 1–2 minutes — run git pull locally to catch up.";
     } catch (err) {
       out.textContent = "Couldn't save: " + err.message;
       out.className = "msg err";
@@ -300,7 +459,7 @@ export function createSiteEditor(api) {
     if (!root) return;
     root.addEventListener("input", onInput);
     root.addEventListener("click", onClick);
-    $("#siteSaveBtn")?.addEventListener("click", save);
+    $("#siteSaveBtn")?.addEventListener("click", () => save(false));
     $("#siteRevertBtn")?.addEventListener("click", () => {
       if (!confirm("Discard unsaved changes to the site content?")) return;
       site = JSON.parse(saved);
@@ -308,5 +467,5 @@ export function createSiteEditor(api) {
     });
   }
 
-  return { load, mount, isDirty };
+  return { load, mount, isDirty, setApiCfg };
 }

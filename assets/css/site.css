@@ -1050,3 +1050,15 @@ footer {
   .specs > div { border-right: 0; border-bottom: 1px solid var(--line); flex-basis: 100%; }
   .specs > div:last-child { border-bottom: 0; }
 }
+
+/* Docs & Profile Photo card rows in the admin editor */
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-soft);
+  flex-wrap: wrap;
+}
+.doc-row:last-child { border-bottom: 0; }
+.doc-info { flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px; }
