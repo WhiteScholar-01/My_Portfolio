@@ -14,7 +14,7 @@
      files    [{label, path, note}]             downloads (PDF, model, report)
    ========================================================================== */
 
-import { $, esc, url, loadProjects } from "./util.js";
+import { $, esc, url, loadProjects, renderSpecs } from "./util.js";
 import { initTheme } from "./theme.js";
 
 const BASE = "../../";   // this page is two folders below the repository root
@@ -29,17 +29,6 @@ function slugFromLocation() {
   let last = parts.at(-1) || "";
   if (/\.html?$/i.test(last)) last = parts.at(-2) || "";
   return decodeURIComponent(last) || document.body.dataset.project || "";
-}
-
-const fmtStatus = s => s ? `<span class="dot" data-s="${esc(s)}"></span>${esc(s)}` : "—";
-
-function renderSpecs(p) {
-  return [
-    ["Status", fmtStatus(p.status)],
-    ["Area",   esc(p.category || "—")],
-    ["Year",   esc(p.year || "—")],
-    ["Where",  esc(p.org || "—")]
-  ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
 }
 
 /**

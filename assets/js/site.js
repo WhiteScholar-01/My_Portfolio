@@ -10,7 +10,7 @@
    fallback markup already in index.html stands. The site never goes blank.
    ========================================================================== */
 
-import { $, $$, esc, url, loadProjects, STATUS_ORDER, PLACEHOLDER } from "./util.js";
+import { $, $$, esc, url, loadProjects, STATUS_ORDER, PLACEHOLDER, renderSpecs } from "./util.js";
 import { initTheme } from "./theme.js";
 import { initHero } from "./hero.js";
 
@@ -391,11 +391,8 @@ function openModal(p) {
   $("#mContent").innerHTML = `
     ${p.image ? `<div class="m-img"><img src="${esc(url(p.image))}" alt="" loading="lazy"></div>` : ""}
     <div class="m-body">
-      <div class="meta">
-        <span class="cat">${esc(p.category)}${p.status ? " · " + esc(p.status) : ""}</span>
-        <span>${esc(p.year || "")}</span>
-      </div>
       <h3 id="mTitle">${esc(p.title)}</h3>
+      <dl class="specs" style="margin: 16px 0">${renderSpecs(p)}</dl>
       ${p.nda ? `<div class="nda-warning">
         <strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> CONFIDENTIAL PROJECT</strong>
         <p>Developed during a research internship under a non-disclosure agreement. Schematics, layout, bill of materials, component selection and repository access are withheld. The description below is limited to design capability.</p>

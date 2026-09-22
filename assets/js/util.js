@@ -31,6 +31,17 @@ export function url(path, base = "") {
 
 export const STATUS_ORDER = ["In progress", "Completed", "Concluded", "Planned", "On hold"];
 
+export const fmtStatus = s => s ? `<span class="dot" data-s="${esc(s)}"></span>${esc(s)}` : "—";
+
+export function renderSpecs(p) {
+  return [
+    ["Status", fmtStatus(p.status)],
+    ["Area",   esc(p.category || "—")],
+    ["Year",   esc(p.year || "—")],
+    ["Where",  esc(p.org || "—")]
+  ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+}
+
 /** Line-drawn placeholder for a project with no image yet. */
 export const PLACEHOLDER = `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor"
   stroke-width="1.3" stroke-linecap="round" aria-hidden="true" width="46" height="46">
