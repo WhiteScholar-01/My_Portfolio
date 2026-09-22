@@ -187,5 +187,8 @@
   },
   "footer": {
     "location": "Aligarh, India"
+  },
+  "docs": {
+    "resumePath": "assets/docs/Saqib_Ali_Resume.pdf"
   }
 }
