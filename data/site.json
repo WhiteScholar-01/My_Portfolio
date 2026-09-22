@@ -3,10 +3,10 @@
     "eyebrow": "Electric",
     "name": "Saqib Ali",
     "roles": [
-      "Electrical engineer",
+      "EE Undergrad @ ZHCET,AMU",
       "Ground Station Engineer @ Orbitalink pvt Ltd",
       "Research intern @IIT Ropar",
-      "Ground Station Designer"
+      "Chairperson @IEEESTBAMU"
     ],
     "lede": "Model it, simulate it, build it, measure it, then fix whatever the measurement showed.\nI design motor drives and satellite antenna tracking systems, and take them through to tested hardware.",
     "ctaLabel": "View projects",
@@ -42,7 +42,7 @@
       },
       {
         "label": "Current role",
-        "value": "Lead Engineer, Orbitalink"
+        "value": "Ground Station Engineer, Orbitalink"
       },
       {
         "label": "Research Intern",
