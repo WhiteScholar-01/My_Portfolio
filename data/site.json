@@ -71,7 +71,7 @@
         ]
       },
       {
-        "role": "Lead Engineer",
+        "role": "Ground Station Engineer",
         "when": "Aug 2025 – Present",
         "org": "Orbitalink Private Limited · Aligarh",
         "bullets": [
@@ -82,7 +82,7 @@
       },
       {
         "role": "Electrical Design Intern",
-        "when": "2025",
+        "when": "June 2025 - Aug 2025",
         "org": "Orbitalink, with AMU Innovation Foundation · Aligarh",
         "bullets": [
           "Designed an adaptive PID controller to stabilise and precisely point a high-inertia antenna tracker."
@@ -94,6 +94,14 @@
         "org": "SS AMU SAT · Aligarh",
         "bullets": [
           "Built the tracker chassis model and two-axis PID positioning logic; support satellite tracking and equipment calibration."
+        ]
+      },
+      {
+        "role": "Chairperson",
+        "when": "Sep 2025 - Present",
+        "org": "IEEE STB AMU",
+        "bullets": [
+          "Leading IEEE STB AMU as a chair"
         ]
       }
     ]
