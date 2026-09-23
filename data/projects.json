@@ -1,5 +1,73 @@
 [
   {
+    "slug": "altium-designer-stm32-test-board",
+    "title": "Altium Designer STM32 Test Board",
+    "year": "2026",
+    "category": "Other",
+    "org": "Self-directed",
+    "status": "Completed",
+    "featured": false,
+    "published": true,
+    "nda": false,
+    "summary": "Designed a compact, custom STM32-based test board featuring USB-C power delivery, an onboard buck converter, and integrated motion sensing. The project was developed entirely in Altium Designer, utilizing hierarchical schematic design.",
+    "details": [
+      "Structured a modular hardware design in Altium using top-level hierarchical block schematics for Power, Microcontroller, and Peripherals.",
+      "Engineered a power delivery system utilizing a USB-C connector and an LTC3405ES6 buck converter to step down +5V to a stable +3.3V.",
+      "Integrated an STM32F042G6U6 microcontroller running on a 24MHz external crystal oscillator.",
+      "Interfaced a high-performance BMI088 Inertial Measurement Unit (IMU) via SPI and provided an external I2C expansion header.",
+      "Optimized PCB footprint real estate by utilizing a zero-cost TC2030-IDC-NL \"Tag-Connect\" footprint for SWD programming and debugging."
+    ],
+    "tags": [],
+    "image": "projects/altium-designer-stm32-test-board/images/cover-mudu1yl4.jpg",
+    "gallery": [
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-132325-mudtuzbf.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-132754-mudtv1gu.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-133026-mudtv4s2.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-133059-mudtv69o.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-133109-mudtv7ya.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-133118-mudtv9fd.jpg",
+        "caption": ""
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Hierarchical Schematic Design",
+        "body": "The project utilizes a top-down hierarchical design methodology in Altium Designer to ensure clean, readable, and reusable schematics. The system is broken down into three primary modules: Power, Microcontroller, and Peripherals, making the netlist generation and team collaboration highly efficient."
+      },
+      {
+        "heading": "Power Regulation Architecture",
+        "body": "Power is supplied via a modern USB4105-GF-A-060 USB-C connector. To power the logic components, an LTC3405ES6 synchronous step-down (buck) DC/DC converter is implemented with a 10uH inductor (NRH2412T100MNGH), efficiently stepping the +5V VBUS down to a clean +3.3V rail."
+      },
+      {
+        "heading": "Microcontroller & Sensor Integration",
+        "body": "The core of the board is an STM32F042G6U6 ARM Cortex-M0 microcontroller paired with a 24MHz crystal (Y200) for precise timing. For spatial tracking and telemetry, the MCU interfaces with a BMI088 6-axis IMU over an SPI bus. Additionally, a 6-pin SM06B-SRSS-TB connector exposes the I2C bus for future peripheral expansion."
+      },
+      {
+        "heading": "PCB Layout & 3D Modeling",
+        "body": "The physical layout was executed in Altium Designer with a focus on signal integrity and compact component placement. Care was taken to properly route the differential USB pairs and high-speed SPI traces. Altium's 3D visualization capabilities were utilized to verify component clearances, connector placement, and the physical manufacturing constraints of the final assembly."
+      }
+    ],
+    "files": [],
+    "code_url": "https://saqib-ali.365.altium.com/designs/E063EA50-B511-432F-ABC1-5982A94D6882",
+    "demo_url": "https://saqib-ali.365.altium.com/designs/E063EA50-B511-432F-ABC1-5982A94D6882"
+  },
+  {
     "slug": "uhf-satellite-image-transfer-sdr-antenna-testing",
     "title": "UHF Satellite Image Transfer & SDR Antenna Testing",
     "year": "",
