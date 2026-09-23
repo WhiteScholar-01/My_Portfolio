@@ -19,6 +19,32 @@
     ],
     "tags": [],
     "image": "projects/altium-designer-stm32-test-board/images/cover-mudu1yl4.jpg",
+    "gallery": [],
+    "sections": [],
+    "files": [],
+    "code_url": "",
+    "demo_url": "https://365.altium.com/files/75495997-DB89-4F9F-9753-A7E7E1DDC3A8"
+  },
+  {
+    "slug": "altium-designer-stm32-test-board",
+    "title": "Altium Designer STM32 Test Board",
+    "year": "2026",
+    "category": "Other",
+    "org": "Self-directed",
+    "status": "Completed",
+    "featured": false,
+    "published": true,
+    "nda": false,
+    "summary": "Designed a compact, custom STM32-based test board featuring USB-C power delivery, an onboard buck converter, and integrated motion sensing. The project was developed entirely in Altium Designer, utilizing hierarchical schematic design.",
+    "details": [
+      "Structured a modular hardware design in Altium using top-level hierarchical block schematics for Power, Microcontroller, and Peripherals.",
+      "Engineered a power delivery system utilizing a USB-C connector and an LTC3405ES6 buck converter to step down +5V to a stable +3.3V.",
+      "Integrated an STM32F042G6U6 microcontroller running on a 24MHz external crystal oscillator.",
+      "Interfaced a high-performance BMI088 Inertial Measurement Unit (IMU) via SPI and provided an external I2C expansion header.",
+      "Optimized PCB footprint real estate by utilizing a zero-cost TC2030-IDC-NL \"Tag-Connect\" footprint for SWD programming and debugging."
+    ],
+    "tags": [],
+    "image": "projects/altium-designer-stm32-test-board/images/cover-mudu1yl4.jpg",
     "gallery": [
       {
         "src": "projects/altium-designer-stm32-test-board/images/screenshot-2026-09-23-132325-mudtuzbf.jpg",
