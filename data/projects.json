@@ -1,5 +1,61 @@
 [
   {
+    "slug": "adaptive-pid-controller-for-antenna-tracking-system",
+    "title": "Adaptive PID Controller for Antenna Tracking System",
+    "year": "2025",
+    "category": "Control",
+    "org": "",
+    "status": "Completed",
+    "featured": false,
+    "published": true,
+    "nda": false,
+    "summary": "Designed and implemented a dual-axis antenna tracking system using an Arduino Uno, AS5600 magnetic rotary encoders, and a custom PID controller. The system drives high-inertia 12V wiper motors with built-in safety features.",
+    "details": [
+      "Engineered a distributed I²C sensor architecture using a PCA9548A multiplexer and BTS7960 H-bridge drivers for bidirectional motor control.",
+      "Developed deterministic 50Hz control loop firmware with a custom ASCII command protocol, emergency stop, and 10-second stall timeout protections.",
+      "Achieved a 3.7-second settling time for 90° steps and an average steady-state tracking error of 0.6° under no-load conditions."
+    ],
+    "tags": [
+      "Arduino",
+      "PID Control",
+      "C++",
+      "I2C",
+      "Motor Control",
+      "AS5600",
+      "Embedded Systems"
+    ],
+    "image": "projects/adaptive-pid-controller-for-antenna-tracking-system/images/cover-mudp5ygk.jpg",
+    "gallery": [
+      {
+        "src": "projects/adaptive-pid-controller-for-antenna-tracking-system/images/screenshot-2026-09-23-112751-mudp1x10.jpg",
+        "caption": "Overall 90° step response"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Hardware Architecture",
+        "body": "The tracking system relies on a distributed sensor architecture centered around an Arduino Uno. A PCA9548A I²C multiplexer was used to interface multiple AS5600 12-bit magnetic encoders, successfully eliminating address conflicts. BTS7960 H-bridge drivers provided the necessary high-current bidirectional control for the 12V permanent-magnet wiper motors."
+      },
+      {
+        "heading": "Firmware & Control Logic",
+        "body": "The firmware executes two coordinated PID loops operating at a deterministic 50Hz (20ms) sampling rate. It communicates via a custom ASCII-based command protocol (e.g., AZ:90.5 EL:45.0). To protect the hardware, the software integrates strict safety mechanisms, including an immediate emergency stop, a 10-second stall timeout, and PWM output limiting to prevent over-current conditions."
+      },
+      {
+        "heading": "PID Tuning & Experimental Results",
+        "body": "Classical Ziegler-Nichols autotuning failed due to motor non-linearities and mechanical friction, requiring a rigorous manual tuning methodology. Using a 6-step manual tuning process, the final PID gains were established at K_p=2.15, K_i=0.25, and K_d=0.2. Experimental trials demonstrated a maximum step overshoot of just 7.9% and stable sequential multi-target tracking without integrator wind-up."
+      }
+    ],
+    "files": [
+      {
+        "label": "Intership Report",
+        "path": "projects/adaptive-pid-controller-for-antenna-tracking-system/Internship__report_250810_220808.pdf",
+        "note": "2.5 MB"
+      }
+    ],
+    "code_url": "",
+    "demo_url": ""
+  },
+  {
     "slug": "437-mhz-9-element-long-yagi",
     "title": "437 MHz 9-element long-Yagi",
     "year": "2026",
