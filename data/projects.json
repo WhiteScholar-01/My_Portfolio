@@ -1,5 +1,64 @@
 [
   {
+    "slug": "uhf-satellite-image-transfer-sdr-antenna-testing",
+    "title": "UHF Satellite Image Transfer & SDR Antenna Testing",
+    "year": "",
+    "category": "RF & antennas",
+    "org": "Orbitalink",
+    "status": "In progress",
+    "featured": false,
+    "published": true,
+    "nda": true,
+    "summary": "Developed and validated an end-to-end Software-Defined Radio (SDR) communication link at 435 MHz to facilitate wireless image transfer. The project involved designing BPSK modulation pipelines in GNU Radio and developing custom Python telemetry scripts.",
+    "details": [
+      "Designed transmit and receive flowgraphs in GNU Radio for 435 MHz UHF communication using HackRF and RTL-SDR hardware operating at 2 MS/s.",
+      "Implemented a BPSK demodulation pipeline featuring root-raised cosine (RRC) filtering, Costas loop carrier recovery, and differential decoding.",
+      "Developed an automated, multi-threaded Python monitoring script to parse incoming binary streams, lock onto frame headers (0xDEADBEEF), and extract payloads in real time.",
+      "Conducted physical antenna testing by calculating live link metrics, including Effective Data Rate (kbps) and Bit Error Rate (BER), to validate signal integrity."
+    ],
+    "tags": [
+      "GNU Radio",
+      "RF Communications",
+      "Digital Signal Processing",
+      "Python",
+      "Telemetry",
+      "HackRF",
+      "RTL-SDR"
+    ],
+    "image": "projects/uhf-satellite-image-transfer-sdr-antenna-testing/images/cover-mudq1dpx.jpg",
+    "gallery": [
+      {
+        "src": "projects/uhf-satellite-image-transfer-sdr-antenna-testing/images/img1-mudq108b.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/uhf-satellite-image-transfer-sdr-antenna-testing/images/img2-mudq12o0.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/uhf-satellite-image-transfer-sdr-antenna-testing/images/img3-mudq14o1.jpg",
+        "caption": ""
+      }
+    ],
+    "sections": [
+      {
+        "heading": "SDR Transmit & Receive Architecture",
+        "body": "To test the ground station antenna's reception capabilities, a complete RF testing pipeline was established. The transmitter flowgraph was configured to broadcast data packets via a HackRF SDR, wrapping the payload with custom preamble and postamble markers. The receiver pipeline, powered by an RTL-SDR, handles the initial signal acquisition, down-conversion, and filtering to isolate the 435 MHz carrier."
+      },
+      {
+        "heading": "Carrier Recovery & Demodulation",
+        "body": "Ensuring signal integrity over the wireless link required a robust digital signal processing chain. The receiver utilizes a Symbol Sync block for timing recovery, combined with a Costas Loop to achieve phase lock and carrier recovery. The BPSK constellation is then decoded, passed through a differential decoder, and verified against a CRC32 checksum to ensure the incoming packets are uncorrupted."
+      },
+      {
+        "heading": "Automated Telemetry & BER Analysis",
+        "body": "To quantify the antenna's tracking efficiency, a custom Python monitor was embedded directly into the GNU Radio receiver. The script continuously scans the raw binary output for a specific magic byte sequence to identify frame boundaries. Upon detecting a complete frame, it automatically extracts the payload, saves the clean image file, and prints real-time Link and BER metrics to validate the accuracy of the RF transfer."
+      }
+    ],
+    "files": [],
+    "code_url": "",
+    "demo_url": ""
+  },
+  {
     "slug": "adaptive-pid-controller-for-antenna-tracking-system",
     "title": "Adaptive PID Controller for Antenna Tracking System",
     "year": "2025",
