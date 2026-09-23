@@ -65,7 +65,7 @@
     "category": "Control",
     "org": "Orbitalink",
     "status": "Completed",
-    "featured": false,
+    "featured": true,
     "published": true,
     "nda": false,
     "summary": "Designed and implemented a dual-axis antenna tracking system using an Arduino Uno, AS5600 magnetic rotary encoders, and a custom PID controller. The system drives high-inertia 12V wiper motors with built-in safety features.",
