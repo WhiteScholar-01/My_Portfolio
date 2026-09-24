@@ -237,6 +237,33 @@
     "demo_url": ""
   },
   {
+    "slug": "two-axis-antenna-tracker",
+    "title": "Two-axis satellite antenna tracker",
+    "year": "2025",
+    "category": "Embedded",
+    "org": "Orbitalink",
+    "featured": false,
+    "published": true,
+    "summary": "Azimuth–elevation tracker for UHF satellite passes, built end to end at Orbitalink.",
+    "details": [
+      "Fusion 360 chassis optimised for rigidity and low weight",
+      "NEMA23 hybrid servos on HSD57 drivers with trapezoidal motion ramps",
+      "EEPROM-saved parameters and a serial command protocol",
+      "Now porting to STM32F411 as modular firmware"
+    ],
+    "tags": [
+      "Fusion 360",
+      "Arduino",
+      "STM32",
+      "C++"
+    ],
+    "image": "",
+    "gallery": [],
+    "code_url": "",
+    "demo_url": "",
+    "status": "In progress"
+  },
+  {
     "slug": "five-phase-ipmsm-foc",
     "title": "Five-phase IPMSM field-oriented control",
     "year": "2026",
@@ -325,33 +352,6 @@
     "files": [],
     "code_url": "",
     "demo_url": ""
-  },
-  {
-    "slug": "two-axis-antenna-tracker",
-    "title": "Two-axis satellite antenna tracker",
-    "year": "2025",
-    "category": "Embedded",
-    "org": "Orbitalink",
-    "featured": false,
-    "published": true,
-    "summary": "Azimuth–elevation tracker for UHF satellite passes, built end to end at Orbitalink.",
-    "details": [
-      "Fusion 360 chassis optimised for rigidity and low weight",
-      "NEMA23 hybrid servos on HSD57 drivers with trapezoidal motion ramps",
-      "EEPROM-saved parameters and a serial command protocol",
-      "Now porting to STM32F411 as modular firmware"
-    ],
-    "tags": [
-      "Fusion 360",
-      "Arduino",
-      "STM32",
-      "C++"
-    ],
-    "image": "",
-    "gallery": [],
-    "code_url": "",
-    "demo_url": "",
-    "status": "In progress"
   },
   {
     "slug": "cross-yagi-435mhz",
