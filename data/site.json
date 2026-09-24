@@ -117,8 +117,7 @@
           "Flux weakening",
           "DTC",
           "SVPWM",
-          "Adaptive PID",
-          "DC-DC converters"
+          "Adaptive PID"
         ]
       },
       {
