@@ -124,7 +124,6 @@
         "title": "Embedded",
         "items": [
           "C / C++",
-          "TI C2000",
           "STM32",
           "Arduino",
           "I2C",
@@ -147,7 +146,6 @@
           "Python",
           "scikit-learn",
           "JavaScript",
-          "Node.js",
           "Git"
         ]
       },
