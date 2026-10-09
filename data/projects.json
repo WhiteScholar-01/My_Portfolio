@@ -336,6 +336,7 @@
     "status": "In progress",
     "featured": false,
     "published": true,
+    "nda": false,
     "summary": "Circularly polarised 14-element cross-Yagi for 435 MHz satellite work, phased mechanically by a quarter-wavelength boom offset and matched to 50 Ω with quarter-wave transformers.",
     "details": [
       "Designed a 14-element cross-Yagi for 435 MHz — two orthogonal 7-element arrays (reflector, driven element, five directors) on a shared 1.14 m boom, modelled wire-by-wire in MMANA-GAL",
@@ -348,7 +349,7 @@
       "NEC",
       "UHF"
     ],
-    "image": "projects/cross-yagi-435mhz/images/cover-mua3q1vg.jpg",
+    "image": "projects/cross-yagi-435mhz/images/cover-mv0dy0zl.jpg",
     "gallery": [
       {
         "src": "projects/cross-yagi-435mhz/images/img-1-mua3neht.jpg",
