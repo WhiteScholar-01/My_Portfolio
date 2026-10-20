@@ -216,8 +216,10 @@
     "year": "2025",
     "category": "Embedded",
     "org": "Orbitalink",
+    "status": "In progress",
     "featured": false,
     "published": true,
+    "nda": false,
     "summary": "Azimuth–elevation tracker for UHF satellite passes, built end to end at Orbitalink.",
     "details": [
       "Fusion 360 chassis optimised for rigidity and low weight",
@@ -233,9 +235,18 @@
     ],
     "image": "",
     "gallery": [],
+    "sections": [],
+    "files": [],
+    "videos": [
+      {
+        "title": "Ground Station Testing",
+        "url": "projects/two-axis-antenna-tracker/videos/hardware-testing-mvgzy9p2.mp4",
+        "poster": "projects/two-axis-antenna-tracker/videos/hardware-testing-mvgzy9p2.jpg",
+        "loop": true
+      }
+    ],
     "code_url": "",
-    "demo_url": "",
-    "status": "In progress"
+    "demo_url": ""
   },
   {
     "slug": "cross-yagi-435mhz",
