@@ -16,6 +16,7 @@
 
 import { $, esc, url, loadProjects, renderSpecs } from "./util.js";
 import { initTheme } from "./theme.js";
+import { renderVideos, activateVideos } from "./media.js";
 
 const BASE = "../../";   // this page is two folders below the repository root
 
@@ -128,6 +129,14 @@ function render(p, list, idx) {
        <code>projects/${esc(p.slug)}/README.md</code>.</p>`);
 
   $("#pSections").innerHTML = renderSections(p);
+  // Older project pages have no #pVideos slot, so make one above the images.
+  $("#pVideos")?.remove();
+  const vids = renderVideos(p, BASE);
+  if (vids) {
+    $("#pGallery").closest(".p-section").insertAdjacentHTML("beforebegin", vids);
+    activateVideos($("#pVideos"));
+    if (location.hash === "#pVideos") requestAnimationFrame(() => $("#pVideos").scrollIntoView());
+  }
   $("#pGallery").innerHTML = renderGallery(p);
   $("#pFiles").innerHTML = renderFiles(p);
 

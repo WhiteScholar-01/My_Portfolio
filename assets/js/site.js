@@ -13,6 +13,7 @@
 import { $, $$, esc, url, loadProjects, STATUS_ORDER, PLACEHOLDER, renderSpecs } from "./util.js";
 import { initTheme } from "./theme.js";
 import { initHero } from "./hero.js";
+import { hasVideo, videoBadge } from "./media.js";
 
 window.__jsReady = true;
 
@@ -372,7 +373,7 @@ function card(p, i) {
     : `<div class="ph">${PLACEHOLDER}</div>`;
   const big = p.featured && byCategory === "All" && byStatus === "All";
   return `<article class="card reveal${big ? " featured" : ""}">
-    <div class="thumb">${img}${statusBadge(p.status)}</div>
+    <div class="thumb">${img}${statusBadge(p.status)}${videoBadge(p)}</div>
     <div class="body">
       <div class="meta"><span class="cat">${esc(p.category)}</span><span>${esc(p.year || "—")}</span></div>
       <h3><a class="stretch" href="projects/${esc(p.slug)}/">${esc(p.title)}</a></h3>
@@ -427,7 +428,8 @@ function openModal(p) {
   const links = [
     `<a class="btn small primary" href="projects/${esc(p.slug)}/">Full write-up</a>`,
     p.code_url && `<a class="btn small" href="${esc(p.code_url)}" target="_blank" rel="noopener">Code</a>`,
-    p.demo_url && `<a class="btn small" href="${esc(p.demo_url)}" target="_blank" rel="noopener">See it live</a>`
+    p.demo_url && `<a class="btn small" href="${esc(p.demo_url)}" target="_blank" rel="noopener">See it live</a>`,
+    hasVideo(p) && `<a class="btn small" href="projects/${esc(p.slug)}/#pVideos">Watch video</a>`
   ].filter(Boolean).join("");
 
   $("#mContent").innerHTML = `

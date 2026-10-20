@@ -138,6 +138,19 @@
           <p class="msg" id="filesMsg" role="status"></p>
         </div>
 
+        <!-- ---------- videos ---------- -->
+        <div class="full editor">
+          <div class="ed-head">
+            <span class="ed-title">Videos</span>
+            <span class="hint">YouTube link, or an MP4 up to 25 MB</span>
+            <button class="btn small" type="button" id="addVideoLink">Add link</button>
+            <label class="btn small file-btn">Upload MP4
+              <input type="file" id="videoFiles" accept="video/mp4,video/webm"></label>
+          </div>
+          <div id="videoRows"></div>
+          <p class="msg" id="videoMsg" role="status"></p>
+        </div>
+
         <label class="full">Tags <span class="hint">comma separated</span>
           <input name="tags" placeholder="MATLAB, Simulink, FOC"></label>
 

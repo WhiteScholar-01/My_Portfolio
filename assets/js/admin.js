@@ -20,6 +20,7 @@
 import { $, $$, esc, slugify } from "./util.js";
 import { initTheme } from "./theme.js";
 import { createSiteEditor } from "./admin-site.js";
+import { videoKind, captureFrame } from "./media.js";
 
 const KEY  = "portfolio-admin";
 const DATA = "data/projects.json";
@@ -31,6 +32,7 @@ let cfg = null, sha = null, projects = [], saved = "[]", pendingCover = null;
 let draftGallery = [];   // [{src, caption}]
 let draftSections = [];  // [{heading, body}]
 let draftFiles = [];     // [{label, path, note}]
+let draftVideos = [];    // [{title, url, poster, loop}]
 
 const say = (el, text, ok) => {
   el.textContent = text;
@@ -158,6 +160,7 @@ function renderList() {
         <span class="pill">${esc(p.category)}</span>
         ${(p.gallery || []).length ? `<span class="pill">${p.gallery.length} image${p.gallery.length > 1 ? "s" : ""}</span>` : ""}
         ${(p.sections || []).length ? `<span class="pill">${p.sections.length} section${p.sections.length > 1 ? "s" : ""}</span>` : ""}
+        ${(p.videos || []).length ? `<span class="pill">${p.videos.length} video${p.videos.length > 1 ? "s" : ""}</span>` : ""}
         ${(p.files || []).length ? `<span class="pill">${p.files.length} file${p.files.length > 1 ? "s" : ""}</span>` : ""}
         ${p.published === false ? `<span class="pill hidden">Hidden</span>` : ""}
         ${p.featured ? `<span class="pill">Featured</span>` : ""}
@@ -209,7 +212,8 @@ function fillForm(p, i) {
   draftGallery = (p.gallery || []).map(g => typeof g === "string" ? { src: g, caption: "" } : { ...g });
   draftSections = (p.sections || []).map(s => ({ ...s }));
   draftFiles = (p.files || []).map(f => ({ ...f }));
-  renderGallery(); renderSections(); renderFiles();
+  draftVideos = (p.videos || []).map(v => ({ ...v }));
+  renderGallery(); renderSections(); renderFiles(); renderVideos();
 
   $("#formTitle").textContent = "Edit project";
   $("#addBtn").textContent = "Update in list";
@@ -220,8 +224,8 @@ function clearForm() {
   form.reset();
   form.index.value = "";
   pendingCover = null;
-  draftGallery = []; draftSections = []; draftFiles = [];
-  renderGallery(); renderSections(); renderFiles();
+  draftGallery = []; draftSections = []; draftFiles = []; draftVideos = [];
+  renderGallery(); renderSections(); renderFiles(); renderVideos();
   $("#formTitle").textContent = "Add a project";
   $("#addBtn").textContent = "Add to list";
   $("#imgPreview").innerHTML = "";
@@ -513,6 +517,96 @@ $("#docFiles").onchange = async e => {
 };
 
 /* --------------------------------------------------------------------------
+   Videos editor
+   -------------------------------------------------------------------------- */
+const MAX_VIDEO = 25 * 1024 * 1024;
+
+function renderVideos() {
+  const wrap = $("#videoRows");
+  if (!draftVideos.length) {
+    wrap.innerHTML = `<p class="hint">No videos. Paste a YouTube link, or upload a short MP4 clip.</p>`;
+    return;
+  }
+  wrap.innerHTML = draftVideos.map((v, i) => {
+    const kind = videoKind(v);
+    const label = { youtube: "YouTube", file: "Upload", link: "Link" }[kind] || "Link";
+    return `
+    <div class="ed-row">
+      <span class="ed-ext">${label}</span>
+      <div class="ed-fields">
+        <input value="${esc(v.url || "")}" data-i="${i}" data-k="url" placeholder="YouTube link or projects/&lt;slug&gt;/videos/clip.mp4" aria-label="Video link">
+        <input value="${esc(v.title || "")}" data-i="${i}" data-k="title" placeholder="Title (optional)" aria-label="Video title">
+        ${kind === "file" ? `<label class="cb-label"><input type="checkbox" data-i="${i}" data-k="loop" ${v.loop ? "checked" : ""}> Loop silently, like a GIF</label>` : ""}
+      </div>
+      <div class="ed-btns">
+        <button class="btn icon" type="button" data-vup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button>
+        <button class="btn icon" type="button" data-vdown="${i}" ${i === draftVideos.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button>
+        <button class="btn icon danger" type="button" data-vdel="${i}" aria-label="Remove">✕</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+$("#videoRows").addEventListener("input", e => {
+  const el = e.target, k = el.dataset.k;
+  if (!k) return;
+  draftVideos[+el.dataset.i][k] = el.type === "checkbox" ? el.checked : el.value;
+});
+$("#videoRows").addEventListener("change", e => {
+  // The Upload/YouTube/Link label and the loop box depend on the URL.
+  if (e.target.dataset.k === "url") renderVideos();
+});
+$("#videoRows").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const d = b.dataset;
+  if (d.vup)   { const i = +d.vup;   [draftVideos[i - 1], draftVideos[i]] = [draftVideos[i], draftVideos[i - 1]]; }
+  if (d.vdown) { const i = +d.vdown; [draftVideos[i + 1], draftVideos[i]] = [draftVideos[i], draftVideos[i + 1]]; }
+  if (d.vdel)  draftVideos.splice(+d.vdel, 1);
+  renderVideos();
+});
+$("#addVideoLink").onclick = () => {
+  draftVideos.push({ title: "", url: "" });
+  renderVideos();
+  $("#videoRows").querySelector(".ed-row:last-child input")?.focus();
+};
+
+$("#videoFiles").onchange = async e => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  const msg = $("#videoMsg");
+  const slug = currentSlug(msg);
+  if (!slug) return;
+  if (f.size > MAX_VIDEO) {
+    say(msg, `${f.name} is ${(f.size / 1048576).toFixed(1)} MB. The limit here is 25 MB. Trim it, or upload it to YouTube and paste the link.`, false);
+    return;
+  }
+  try {
+    const stamp = Date.now().toString(36);
+    const base = slugify(f.name.replace(/\.[^.]+$/, ""));
+    const ext = (f.name.split(".").pop() || "mp4").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    let poster = "";
+    try {
+      say(msg, "Grabbing a poster frame…", true);
+      const jpg = await captureFrame(f);
+      poster = `projects/${slug}/videos/${base}-${stamp}.jpg`;
+      await put(poster, jpg, `Add poster ${poster}`);
+    } catch { poster = ""; }   // the clip still works without one
+
+    say(msg, `Uploading ${f.name}…`, true);
+    const path = `projects/${slug}/videos/${base}-${stamp}.${ext}`;
+    await put(path, await readAsB64(f), `Add video ${path}`);
+    draftVideos.push({ title: "", url: path, ...(poster ? { poster } : {}) });
+    renderVideos();
+    say(msg, `Uploaded. Add a title if you like, then press ${form.index.value === "" ? "Add to list" : "Update in list"}.`, true);
+  } catch (err) {
+    say(msg, `${f.name}: ${err.message}`, false);
+  }
+};
+
+/* --------------------------------------------------------------------------
    Save the form into the list
    -------------------------------------------------------------------------- */
 form.onsubmit = async e => {
@@ -551,6 +645,13 @@ form.onsubmit = async e => {
                              .map(s => ({ heading: (s.heading || "").trim(), body: (s.body || "").trim() })),
       files: draftFiles.filter(f => (f.path || "").trim())
                        .map(f => ({ label: (f.label || "").trim(), path: f.path.trim(), note: (f.note || "").trim() })),
+      videos: draftVideos.filter(v => (v.url || "").trim())
+                         .map(v => ({
+                           title: (v.title || "").trim(),
+                           url: v.url.trim(),
+                           ...(v.poster ? { poster: v.poster } : {}),
+                           ...(v.loop ? { loop: true } : {})
+                         })),
       code_url: form.code_url.value.trim(),
       demo_url: form.demo_url.value.trim()
     };
@@ -687,6 +788,6 @@ $$(".tab").forEach(btn => btn.onclick = () => {
    Boot
    -------------------------------------------------------------------------- */
 initTheme();
-renderGallery(); renderSections(); renderFiles();
+renderGallery(); renderSections(); renderFiles(); renderVideos();
 const stored = localStorage.getItem(KEY) || sessionStorage.getItem(KEY);
 if (stored) { cfg = JSON.parse(stored); connectAndLoad(); }

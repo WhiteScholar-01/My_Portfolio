@@ -1062,3 +1062,13 @@ footer {
 }
 .doc-row:last-child { border-bottom: 0; }
 .doc-info { flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px; }
+
+/* ---- video badge on project cards ---- */
+.vid-badge {
+  position: absolute; right: 10px; bottom: 10px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font: 500 .72rem var(--font-mono);
+  padding: 3px 8px 3px 6px; border-radius: 99px;
+  background: rgba(10, 20, 32, .82); color: #F5F2EB;
+}
+.vid-badge svg { width: 12px; height: 12px; }
