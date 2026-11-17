@@ -217,25 +217,50 @@
     "category": "Embedded",
     "org": "Orbitalink",
     "status": "In progress",
-    "featured": false,
+    "featured": true,
     "published": true,
-    "nda": false,
-    "summary": "Azimuth–elevation tracker for UHF satellite passes, built end to end at Orbitalink.",
+    "nda": true,
+    "summary": "A two-axis (azimuth-elevation) antenna tracker for following UHF satellites, developed at Orbitalink under NDA. I designed the chassis for the early versions and wrote the motion-control firmware.",
     "details": [
-      "Fusion 360 chassis optimised for rigidity and low weight",
-      "NEMA23 hybrid servos on HSD57 drivers with trapezoidal motion ramps",
-      "EEPROM-saved parameters and a serial command protocol",
-      "Now porting to STM32F411 as modular firmware"
+      "Designed the two-axis chassis for the earlier versions of the tracker in Fusion 360",
+      "Integrated closed-loop motor drives on both axes",
+      "Developed field unit for the tracker and worked on its internal wiring and design",
+      "Wrote a firmware that provides serial command interface for pointing the antenna and changing settings from a computer",
+      "Tested the complete system with a cross-Yagi antenna mounted on the boom",
+      "Porting the firmware to a new microcontroller platform as a modular codebase"
     ],
     "tags": [
       "Fusion 360",
-      "Arduino",
+      "Embedded C++",
       "STM32",
-      "C++"
+      "Motion control",
+      "Firmware"
     ],
-    "image": "",
-    "gallery": [],
-    "sections": [],
+    "image": "projects/two-axis-antenna-tracker/images/cover-mwkuakuq.jpg",
+    "gallery": [
+      {
+        "src": "projects/two-axis-antenna-tracker/images/tracker-head-detail-mwktmiz8.jpg",
+        "caption": ""
+      },
+      {
+        "src": "projects/two-axis-antenna-tracker/images/tracker-base-detail-mwktmn32.jpg",
+        "caption": ""
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Why a tracker",
+        "body": "A satellite in low Earth orbit is above the horizon for only a few minutes at a time, and it moves across the whole sky during that window. A Yagi has most of its gain in a narrow beam, so it only works if it stays pointed at the satellite the entire time.\n\nThat means turning the antenna in two directions at once: azimuth (left and right) and elevation (up and down). Doing that by hand for every pass is not practical, so the antenna needs a mount that can follow the satellite on its own."
+      },
+      {
+        "heading": "My part",
+        "body": "I worked on the development of field unit and the firmware that moves the antenna.\n\nOn field Unit side, I worked on the design  and  wiring of field unit.\nOn the firmware side, I wrote the motion control for both axes. Every move follows a trapezoidal speed profile (accelerate, hold speed, decelerate), so the boom does not jerk at the start or end of a move. The settings are kept in non-volatile memory, and a computer controls the tracker over a serial link."
+      },
+      {
+        "heading": "Current work",
+        "body": "I am moving the firmware to a different microcontroller and splitting it into separate modules, one for each job. The motion behaviour stays the same as the current version, so the new controller should move the antenna exactly the way the old one does."
+      }
+    ],
     "files": [],
     "videos": [
       {
