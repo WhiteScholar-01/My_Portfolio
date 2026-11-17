@@ -254,7 +254,7 @@
       },
       {
         "heading": "My part",
-        "body": "I worked on the development of field unit and the firmware that moves the antenna.\n\nOn field Unit side, I worked on the design  and  wiring of field unit.\nOn the firmware side, I wrote the motion control for both axes. Every move follows a trapezoidal speed profile (accelerate, hold speed, decelerate), so the boom does not jerk at the start or end of a move. The settings are kept in non-volatile memory, and a computer controls the tracker over a serial link."
+        "body": "I worked on the development of field unit(FU) and the firmware that moves the antenna.\n\nOn field Unit side, I worked on the design  and  wiring of field unit.\nOn the firmware side, I wrote the motion control for both axes. Every move follows a trapezoidal speed profile (accelerate, hold speed, decelerate), so the boom does not jerk at the start or end of a move. The settings are kept in non-volatile memory, and a computer controls the tracker over a serial link."
       },
       {
         "heading": "Current work",
