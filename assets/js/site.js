@@ -439,7 +439,7 @@ function openModal(p) {
       <dl class="specs" style="margin: 16px 0">${renderSpecs(p)}</dl>
       ${p.nda ? `<div class="nda-warning">
         <strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> CONFIDENTIAL PROJECT</strong>
-        <p>Developed during a research internship under a non-disclosure agreement. Schematics, layout, bill of materials, component selection and repository access are withheld. The description below is limited to design capability.</p>
+        <p>Some details of this work are confidential, so only an overview is shared here.</p>
       </div>` : ""}
       <p class="muted">${esc(p.summary)}</p>
       ${p.details?.length ? `<ul>${p.details.map(d => `<li>${esc(d)}</li>`).join("")}</ul>` : ""}
