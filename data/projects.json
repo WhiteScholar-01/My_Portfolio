@@ -217,8 +217,8 @@
     "category": "Embedded",
     "org": "Orbitalink",
     "status": "In progress",
-    "featured": true,
-    "published": true,
+    "featured": false,
+    "published": false,
     "nda": true,
     "summary": "A two-axis (azimuth-elevation) antenna tracker for following UHF satellites, developed at Orbitalink under NDA. I designed the chassis for the early versions and wrote the motion-control firmware.",
     "details": [
@@ -237,16 +237,7 @@
       "Firmware"
     ],
     "image": "projects/two-axis-antenna-tracker/images/cover-mwkv2fy3.jpg",
-    "gallery": [
-      {
-        "src": "projects/two-axis-antenna-tracker/images/tracker-base-detail-mwktmn32.jpg",
-        "caption": ""
-      },
-      {
-        "src": "projects/two-axis-antenna-tracker/images/tracker-head-detail-mwkv1iid.jpg",
-        "caption": ""
-      }
-    ],
+    "gallery": [],
     "sections": [
       {
         "heading": "Why a tracker",
