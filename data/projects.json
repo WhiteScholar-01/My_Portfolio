@@ -218,7 +218,7 @@
     "org": "Orbitalink",
     "status": "In progress",
     "featured": false,
-    "published": false,
+    "published": true,
     "nda": true,
     "summary": "A two-axis (azimuth-elevation) antenna tracker for following UHF satellites, developed at Orbitalink under NDA. I designed the chassis for the early versions and wrote the motion-control firmware.",
     "details": [
